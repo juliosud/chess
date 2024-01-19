@@ -88,11 +88,22 @@ public class ChessPiece {
     private void addPawnMoves(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition) {
         int direction = this.getTeamColor() == ChessGame.TeamColor.WHITE ? 1 : -1;
         int startRow = this.getTeamColor() == ChessGame.TeamColor.WHITE ? 2 : 7;
+        int promotionRow = this.getTeamColor() == ChessGame.TeamColor.WHITE ? 8 : 1;
 
         // Forward move
         int forwardRow = myPosition.getRow() + direction;
         if (isValidPosition(forwardRow, myPosition.getColumn()) && board.getPiece(new ChessPosition(forwardRow, myPosition.getColumn())) == null) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), null));
+            if (forwardRow == promotionRow) {
+                // Pawn promotion logic - promoting to a queen for simplicity
+                moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), PieceType.QUEEN));
+                moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), PieceType.KNIGHT));
+                moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), PieceType.BISHOP));
+
+            } else {
+                // Regular forward move
+                moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, myPosition.getColumn()), null));
+            }
 
             // Two-square move from starting position
             if (myPosition.getRow() == startRow) {
@@ -109,15 +120,24 @@ public class ChessPiece {
             if (isValidPosition(forwardRow, captureCol)) {
                 ChessPiece capturePiece = board.getPiece(new ChessPosition(forwardRow, captureCol));
                 if (capturePiece != null && capturePiece.getTeamColor() != this.getTeamColor()) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), null));
+                    if (forwardRow == promotionRow) {
+                        // Capture with pawn promotion
+                        moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), PieceType.QUEEN));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), PieceType.ROOK));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), PieceType.KNIGHT));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), PieceType.BISHOP));
+                    } else {
+                        // Regular capture
+                        moves.add(new ChessMove(myPosition, new ChessPosition(forwardRow, captureCol), null));
+                    }
                 }
-
-                // En Passant capture here if applicable
+                // Include logic for En Passant capture here if applicable
             }
         }
 
-        // Pawn Promotion
+        // Additional logic for special pawn moves like En Passant can be added here
     }
+
 
     private void addRookMoves(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition) {
         // Check horizontal and vertical lines from the Rook's position
