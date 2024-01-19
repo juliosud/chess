@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -177,26 +178,26 @@ public class ChessPiece {
     }
 
     private void addBishopMoves(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition) {
-        // Bishops can move diagonally in four directions
         int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
 
         for (int[] direction : directions) {
             int row = myPosition.getRow();
             int col = myPosition.getColumn();
 
+            //This loop will iterate over all the diagonals until it is out of range
             while (true) {
                 row += direction[0];
                 col += direction[1];
 
                 if (!isValidPosition(row, col)) {
-                    break; // Break if the position is off the board
+                    break;
                 }
 
                 ChessPosition newPosition = new ChessPosition(row, col);
                 ChessPiece pieceAtDestination = board.getPiece(newPosition);
 
+                //check if the destination is null
                 if (pieceAtDestination == null) {
-                    // Add move if the square is empty
                     moves.add(new ChessMove(myPosition, newPosition, null));
                 } else {
                     // Add move if the square contains an opponent's piece, but then break
@@ -213,9 +214,9 @@ public class ChessPiece {
         int[][] directions = {
                 {1, 0}, {-1, 0},  // Vertical
                 {0, 1}, {0, -1},  // Horizontal
-                // Diagonal moves like a Bishop
-                {1, 1}, {1, -1},
-                {-1, 1}, {-1, -1}
+
+                {1, 1}, {1, -1}, //Dia
+                {-1, 1}, {-1, -1}//
         };
 
         for (int[] direction : directions) {
@@ -274,8 +275,24 @@ public class ChessPiece {
     private boolean isValidPosition(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
-//    private boolean isValidPosition(int row, int col) {
-//        // Adjusting for 1-based position
-//        return row >= 0 && row <= 7 && col >= 0 && col <= 7;
-//    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ChessPiece that = (ChessPiece) obj;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
+
 }
