@@ -296,24 +296,6 @@ public class ChessPiece {
     private boolean isValidPosition(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
-//
-//    @Override
-//    public String toString() {
-//        return super.toString();
-//    }
-//
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) return true;
-//        if (obj == null || getClass() != obj.getClass()) return false;
-//        ChessPiece that = (ChessPiece) obj;
-//        return pieceColor == that.pieceColor && type == that.type;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(pieceColor, type);
-//    }
 
 
     @Override
