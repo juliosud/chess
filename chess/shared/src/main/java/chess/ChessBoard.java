@@ -46,25 +46,39 @@ public class ChessBoard {
         throw new RuntimeException("Not implemented");
     }
 
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null || getClass() != obj.getClass()) return false;
+//
+//        ChessBoard that = (ChessBoard) obj;
+//
+//        for (int i = 0; i < 8; i++) {
+//            for (int j = 0; j < 8; j++) {
+//                if (!Objects.equals(this.squares[i][j], that.squares[i][j])) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Arrays.deepHashCode(squares);
+//    }
+
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        ChessBoard that = (ChessBoard) obj;
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (!Objects.equals(this.squares[i][j], that.squares[i][j])) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(squares, that.squares);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(squares);
+        return Arrays.hashCode(squares);
     }
 }

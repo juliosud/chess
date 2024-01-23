@@ -46,19 +46,35 @@ public class ChessMove {
 //        throw new RuntimeException("Not implemented");
         return promotionPiece;
     }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(startPosition, endPosition, promotionPiece);
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null || getClass() != obj.getClass()) return false;
+//        ChessMove that = (ChessMove) obj;
+//        return Objects.equals(startPosition, that.startPosition) &&
+//                Objects.equals(endPosition, that.endPosition) &&
+//                promotionPiece == that.promotionPiece;
+//    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+    }
 
     @Override
     public int hashCode() {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        ChessMove that = (ChessMove) obj;
-        return Objects.equals(startPosition, that.startPosition) &&
-                Objects.equals(endPosition, that.endPosition) &&
-                promotionPiece == that.promotionPiece;
-    }
+
 }

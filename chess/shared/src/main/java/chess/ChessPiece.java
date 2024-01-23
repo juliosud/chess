@@ -62,7 +62,7 @@ public class ChessPiece {
 
         switch (this.getPieceType()) {
             case KING:
-                addKingMoves(moves, board, myPosition);
+                  addKingMoves(moves, board, myPosition);
                 break;
             case QUEEN:
                 addQueenMoves(moves, board, myPosition);
@@ -142,6 +142,7 @@ public class ChessPiece {
     private void addRookMoves(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition) {
         // Check horizontal and vertical lines from the Rook's position
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
 
         for (int[] direction : directions) {
             int row = myPosition.getRow();
@@ -295,17 +296,31 @@ public class ChessPiece {
     private boolean isValidPosition(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
+//
+//    @Override
+//    public String toString() {
+//        return super.toString();
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null || getClass() != obj.getClass()) return false;
+//        ChessPiece that = (ChessPiece) obj;
+//        return pieceColor == that.pieceColor && type == that.type;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(pieceColor, type);
+//    }
+
 
     @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        ChessPiece that = (ChessPiece) obj;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
         return pieceColor == that.pieceColor && type == that.type;
     }
 
@@ -313,6 +328,4 @@ public class ChessPiece {
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
-
-
 }
