@@ -80,7 +80,7 @@ public class ChessBoard {
             for (int j = 0; j < squares[i].length; j++) {
                 ChessPiece originalPiece = this.squares[i][j];
                 if (originalPiece != null) {
-                    // Assuming ChessPiece has a copy constructor or clone method.
+                    // Assuming ChessPiece has a copy constructor or clone method.;
                     // If not, and if ChessPiece is immutable, you can directly assign the instance.
                     newBoard.squares[i][j] = originalPiece;
                 }
