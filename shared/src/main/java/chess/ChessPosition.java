@@ -23,7 +23,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-     /*   throw new RuntimeException("Not implemented");*/
+//        throw new RuntimeException("Not implemented");
         return row;
     }
 
@@ -48,7 +48,4 @@ public class ChessPosition {
     public int hashCode() {
         return Objects.hash(row, col);
     }
-
-
 }
-
