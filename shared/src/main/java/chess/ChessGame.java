@@ -68,17 +68,17 @@ public class ChessGame {
 //        while (iterator.hasNext()) {
 //            ChessMove move = iterator.next();
 //            ChessBoard testBoard = board.deepCopy();
-//            ChessGame testGame = new ChessGame(); // Assume constructor that accepts a board and teamTurn
+//            ChessGame testGame = new ChessGame();
 //            testGame.board = testBoard;
 //            testGame.teamTurn = teamTurn;
 //
 //            try {
 //                testGame.makeMove(move);
 //                if (testGame.isInCheck(piece.getTeamColor())) {
-//                    iterator.remove(); // Remove the move if it results in a check
+//                    iterator.remove();
 //                }
 //            } catch (InvalidMoveException e) {
-//                iterator.remove(); // Remove the move if it's invalid
+//                iterator.remove();
 //            }
 //        }
 
@@ -190,7 +190,7 @@ public class ChessGame {
                     Collection<ChessMove> moves = piece.pieceMoves(board, position);
                     for (ChessMove move : moves) {
                         if (!simulateMoveAndCheck(move, teamColor)) {
-                            return false; // Found a legal move, not stalemate
+                            return false;
                         }
                     }
                 }
@@ -210,7 +210,7 @@ public class ChessGame {
         board.addPiece(move.getStartPosition(), null);
 
         // Check for check status
-        boolean isInCheckAfterMove = isInCheck(teamColor); // You need to implement this based on your game logic
+        boolean isInCheckAfterMove = isInCheck(teamColor);
 
         // Revert the move to original state
         board.addPiece(move.getStartPosition(), movingPiece);
@@ -239,13 +239,13 @@ public class ChessGame {
                     Collection<ChessMove> moves = piece.pieceMoves(board, position);
                     for (ChessMove move : moves) {
                         if (!simulateMoveAndCheck(move, teamColor)) {
-                            return false; // Found at least one valid move, so not stalemate
+                            return false;
                         }
                     }
                 }
             }
         }
-        return true; // No valid moves found, so it's a stalemate
+        return true;
     }
 
     /**
