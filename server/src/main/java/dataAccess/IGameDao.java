@@ -11,5 +11,5 @@ public interface IGameDao {
     void deleteGame(int gameId)  throws DataAccessException;
     List<GameData> listGames();
     void clear();
-    void joinGame() throws DataAccessException;
+    void joinGame(int gameId, String username, String playerColor) throws DataAccessException;
 }

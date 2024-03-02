@@ -55,17 +55,8 @@ public class GameDao implements IGameDao {
         gameIdCounter.set(0);
     }
 
+    @Override
     public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
-        GameData game = games.get(gameId);
-        if (game == null) {
-            throw new DataAccessException("Game not found.");
-        }
-        if (playerColor == null) {
-            game.addObserver(username);
-        } else if (!game.setPlayer(username, playerColor)) {
-            throw new DataAccessException("Requested color is already taken or invalid.");
-        }
-        games.put(gameId, game); // Update the game state
     }
 
 

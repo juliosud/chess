@@ -40,12 +40,7 @@ public class GameService {
         gameDao.clear();
     }
 
-    public void joinGame(int gameId, String username, String playerColor) throws Exception {
-        try {
-            gameDao.joinGame(gameId, username, playerColor);
-        } catch (DataAccessException e) {
-            throw new Exception("Failed to join game: " + e.getMessage());
-        }
+    public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
     }
 
 }
