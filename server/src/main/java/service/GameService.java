@@ -1,8 +1,7 @@
 package service;
 
-import dataAccess.DataAccessException;
+import dataAccess.exceptions.DataAccessException;
 import dataAccess.IGameDao;
-import model.AuthData;
 import model.GameData;
 
 import java.util.List;

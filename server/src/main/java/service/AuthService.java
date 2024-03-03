@@ -1,6 +1,6 @@
 package service;
 
-import dataAccess.DataAccessException;
+import dataAccess.exceptions.DataAccessException;
 import dataAccess.IAuthDao;
 import model.AuthData;
 import java.security.SecureRandom;
