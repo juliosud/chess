@@ -45,19 +45,35 @@ public class GameDao implements IGameDao {
     }
 
     @Override
-    public List<GameData> listGames() {
-        return new ArrayList<>(games.values());
+    public List<GameData> listGames() throws DataAccessException {
+        try {
+            return new ArrayList<>(games.values());
+        } catch (Exception e) {
+            throw new DataAccessException("Failed to list games: " + e.getMessage());
+        }
     }
 
     @Override
-    public void clear() {
-        games.clear();
-        gameIdCounter.set(0);
+    public void clear() throws DataAccessException {
+        try {
+            // Similarly, clearing the data store might fail in a real database scenario.
+            games.clear();
+            gameIdCounter.set(0);
+        } catch (Exception e) {
+            throw new DataAccessException("Failed to clear games: " + e.getMessage());
+        }
     }
 
     @Override
     public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
+        try {
+            // Placeholder for join game logic
+            // Throw DataAccessException on failure
+        } catch (Exception e) {
+            throw new DataAccessException("Failed to join game: " + e.getMessage());
+        }
     }
+
 
 
 }

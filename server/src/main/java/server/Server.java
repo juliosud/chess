@@ -119,7 +119,7 @@ public class Server {
         try {
             String authToken = req.headers("Authorization");
             GameData gameData = gson.fromJson(req.body(), GameData.class);
-            GameData createdGame = gameService.createGame(authToken, gameData);
+            Integer createdGame = gameService.createGame(authToken, gameData);
             res.status(200);
             return gson.toJson(createdGame);
         } catch (UnauthorizedException e) {
@@ -137,12 +137,25 @@ public class Server {
         }
     }
 
-    private Object listGames(Request req, Response res) throws DataAccessException{
-        String authToken = req.headers("Authorization");
-        List<GameData> games = gameService.listGames(authToken);
-        res.status(200); // HTTP 200 OK
+    private Object listGames(Request req, Response res) {
         res.type("application/json");
-        return gson.toJson(Map.of("games", games));
+        try {
+            String authToken = req.headers("Authorization");
+            List<GameData> games = gameService.listGames(authToken);
+            res.status(200); // HTTP 200 OK
+            return gson.toJson(Map.of("games", games));
+        } catch (UnauthorizedException e) {
+            // Handling unauthorized access (wrong username/password)
+            res.status(401);
+            return gson.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (DataAccessException e) {
+            // Handling internal server errors, such as database access issues
+            res.status(500);
+            return gson.toJson(Map.of("message", "Error: description"));
+        } catch (Exception e) {
+            res.status(500);
+            return gson.toJson(Map.of("message", "An unexpected error occurred"));
+        }
     }
 
     private Object joinGame(Request req, Response res) throws DataAccessException{
@@ -154,10 +167,20 @@ public class Server {
     }
 
     private Object clear(Request req, Response res) {
-        userService.clearAll();
-        gameService.clearAll();
-        res.status(200); // HTTP 200 OK
-        return "All data cleared";
+        try {
+            userService.clear();
+            gameService.clear();
+            authService.clear();
+            res.status(200); // HTTP 200 OK
+            return "All data cleared";
+        } catch (DataAccessException e) {
+            // Handling internal server errors, such as database access issues
+            res.status(500);
+            return gson.toJson(Map.of("message", "Error: description"));
+        } catch (Exception e) {
+            res.status(500);
+            return gson.toJson(Map.of("message", "An unexpected error occurred"));
+        }
     }
 
     public void stop() {

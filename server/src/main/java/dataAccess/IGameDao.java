@@ -10,7 +10,7 @@ public interface IGameDao {
     GameData getGame(int gameId)  throws DataAccessException;
     void updateGame(int gameId, GameData game) throws DataAccessException;
     void deleteGame(int gameId)  throws DataAccessException;
-    List<GameData> listGames();
-    void clear();
+    List<GameData> listGames() throws DataAccessException;
+    void clear()throws DataAccessException;
     void joinGame(int gameId, String username, String playerColor) throws DataAccessException;
 }

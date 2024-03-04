@@ -21,7 +21,7 @@ public class GameService {
 
     public Integer createGame(String authToken, GameData gameName) throws DataAccessException, UnauthorizedException, BadRequestException {
         // Validate authToken
-        if (authDao.getAuthToken(authToken) == null || authToken.isEmpty()) {
+        if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
             throw new UnauthorizedException("Invalid or expired authToken.");
         }
 
@@ -43,7 +43,24 @@ public class GameService {
         // Retrieve and return the newly created game with its assigned ID
         return gameDao.getGame(gameId).gameID();
     }
-}
+
+    public List<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
+        // Validate the authToken
+        if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
+            throw new UnauthorizedException("Invalid or expired authToken.");
+        }
+
+        try {
+            return gameDao.listGames();
+        } catch (Exception e) {
+            // Wrap any unexpected exceptions into a DataAccessException
+            throw new DataAccessException("Failed to list games: " + e.getMessage());
+        }
+    }
+
+    void clear() throws DataAccessException{
+        gameDao.clear();
+    }
 
     public GameData getGame(int gameId) throws DataAccessException{
         return gameDao.getGame(gameId);
@@ -57,13 +74,9 @@ public class GameService {
         gameDao.deleteGame(gameId);
     }
 
-    public List<GameData> listGames() {
-        return gameDao.listGames();
-    }
 
-    void clear(){
-        gameDao.clear();
-    }
+
+
 
     public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
     }
