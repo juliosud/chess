@@ -1,23 +1,49 @@
 package service;
 
+import dataAccess.IAuthDao;
+import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import dataAccess.IGameDao;
+import dataAccess.exceptions.UnauthorizedException;
 import model.GameData;
+import model.AuthData;
 
 import java.util.List;
 
 public class GameService {
     private final IGameDao gameDao;
+    private final IAuthDao authDao;
 
-    public GameService(IGameDao gameDao) {
+    public GameService(IGameDao gameDao, IAuthDao authDao) {
         this.gameDao = gameDao;
+        this.authDao = authDao;
     }
 
-    public GameData createGame(String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
-        GameData game = new GameData(0, whiteUsername, blackUsername, gameName); // '0' as placeholder for ID
-        int gameId = gameDao.insertGame(game);
-        return gameDao.getGame(gameId); // Retrieve the game to include the generated ID
+    public Integer createGame(String authToken, GameData gameName) throws DataAccessException, UnauthorizedException, BadRequestException {
+        // Validate authToken
+        if (authDao.getAuthToken(authToken) == null || authToken.isEmpty()) {
+            throw new UnauthorizedException("Invalid or expired authToken.");
+        }
+
+        // Validate gameName or any other game data
+        if (gameName == null || gameName.gameName() == null || gameName.gameName().isEmpty()) {
+            throw new BadRequestException("Game name cannot be empty.");        }
+
+        // Assuming GameData requires only a gameName for simplification
+        // Generate a new game ID in the DAO layer, not here, to keep business logic out of the service layer
+        GameData game = new GameData(0, null, null, gameName.gameName()); // Placeholder '0' for ID, assuming DAO assigns real ID
+
+        int gameId;
+        try {
+            gameId = gameDao.insertGame(game);
+        } catch (Exception e) {
+            throw new DataAccessException("Failed to create a new game: " + e.getMessage());
+        }
+
+        // Retrieve and return the newly created game with its assigned ID
+        return gameDao.getGame(gameId).gameID();
     }
+}
 
     public GameData getGame(int gameId) throws DataAccessException{
         return gameDao.getGame(gameId);

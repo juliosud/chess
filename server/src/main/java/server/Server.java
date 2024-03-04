@@ -17,6 +17,8 @@ import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
+
+import java.util.List;
 import java.util.Map;
 
 
@@ -33,7 +35,7 @@ public class Server {
 
         this.userService = new UserService(userDao, authDao);
         this.authService = new AuthService(authDao);
-        this.gameService = new GameService(gameDao);
+        this.gameService = new GameService(gameDao,authDao);
     }
 
     public int run(int desiredPort) {
@@ -112,21 +114,35 @@ public class Server {
 
     }
 
+    private Object createGame(Request req, Response res) {
+        res.type("application/json");
+        try {
+            String authToken = req.headers("Authorization");
+            GameData gameData = gson.fromJson(req.body(), GameData.class);
+            GameData createdGame = gameService.createGame(authToken, gameData);
+            res.status(200);
+            return gson.toJson(createdGame);
+        } catch (UnauthorizedException e) {
+            res.status(401);
+            return gson.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (BadRequestException e) {
+            res.status(400);
+            return gson.toJson(Map.of("message", "Error: bad request"));
+        } catch (DataAccessException e) {
+            res.status(500);
+            return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+        } catch (Exception e) {
+            res.status(500);
+            return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
     private Object listGames(Request req, Response res) throws DataAccessException{
         String authToken = req.headers("Authorization");
         List<GameData> games = gameService.listGames(authToken);
         res.status(200); // HTTP 200 OK
         res.type("application/json");
         return gson.toJson(Map.of("games", games));
-    }
-
-    private Object createGame(Request req, Response res) throws DataAccessException{
-        String authToken = req.headers("Authorization");
-        GameData gameData = gson.fromJson(req.body(), GameData.class);
-        GameData createdGame = gameService.createGame(authToken, gameData);
-        res.status(200); // HTTP 200 OK
-        res.type("application/json");
-        return gson.toJson(createdGame);
     }
 
     private Object joinGame(Request req, Response res) throws DataAccessException{
