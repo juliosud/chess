@@ -35,8 +35,13 @@ public class AuthService {
         authDao.deleteAuthToken(token);
     }
 
-    public void clear(){
-        authDao.clear();
+    public void clear() throws DataAccessException{
+        try {
+            authDao.clear();
+        } catch (Exception e) {
+            throw new DataAccessException("An error occurred while Clearing: " + e.getMessage());
+        }
+
     }
 }
 

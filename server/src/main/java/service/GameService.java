@@ -1,6 +1,7 @@
 package service;
 
 import dataAccess.IAuthDao;
+import dataAccess.exceptions.AlreadyTakenException;
 import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import dataAccess.IGameDao;
@@ -20,66 +21,70 @@ public class GameService {
     }
 
     public Integer createGame(String authToken, GameData gameName) throws DataAccessException, UnauthorizedException, BadRequestException {
-        // Validate authToken
         if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
             throw new UnauthorizedException("Invalid or expired authToken.");
         }
-
-        // Validate gameName or any other game data
         if (gameName == null || gameName.gameName() == null || gameName.gameName().isEmpty()) {
             throw new BadRequestException("Game name cannot be empty.");        }
 
-        // Assuming GameData requires only a gameName for simplification
-        // Generate a new game ID in the DAO layer, not here, to keep business logic out of the service layer
-        GameData game = new GameData(0, null, null, gameName.gameName()); // Placeholder '0' for ID, assuming DAO assigns real ID
-
+        GameData game = new GameData(0, null, null, gameName.gameName());
         int gameId;
+
         try {
             gameId = gameDao.insertGame(game);
         } catch (Exception e) {
             throw new DataAccessException("Failed to create a new game: " + e.getMessage());
         }
 
-        // Retrieve and return the newly created game with its assigned ID
         return gameDao.getGame(gameId).gameID();
     }
 
     public List<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
-        // Validate the authToken
         if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
             throw new UnauthorizedException("Invalid or expired authToken.");
         }
-
         try {
             return gameDao.listGames();
         } catch (Exception e) {
-            // Wrap any unexpected exceptions into a DataAccessException
             throw new DataAccessException("Failed to list games: " + e.getMessage());
         }
     }
 
-    void clear() throws DataAccessException{
-        gameDao.clear();
+    public void clear() throws DataAccessException{
+        try {
+            gameDao.clear();
+        } catch (Exception e) {
+            throw new DataAccessException("Fail to clear: " + e.getMessage());
+        }
+
     }
 
-    public GameData getGame(int gameId) throws DataAccessException{
-        return gameDao.getGame(gameId);
+    public void joinGame(String authToken, int gameId, String playerColor) throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
+        if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
+            throw new UnauthorizedException("Invalid or expired authToken.");
+        }
+        AuthData user = authDao.getAuthToken(authToken);
+        GameData game = gameDao.getGame(gameId);
+        if (game == null) {
+            throw new BadRequestException("Game not found with ID: " + gameId);
+        }
+
+        boolean updateNeeded = false;
+        if ("WHITE".equalsIgnoreCase(playerColor) && (game.whiteUsername() == null || game.whiteUsername().isEmpty())) {
+            game = new GameData(game.gameID(), user.username(), game.blackUsername(), game.gameName()); // Assuming authToken or a user identifier from authToken is used as username
+            updateNeeded = true;
+        } else if ("BLACK".equalsIgnoreCase(playerColor) && (game.blackUsername() == null || game.blackUsername().isEmpty())) {
+            game = new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName()); // Same assumption as above
+            updateNeeded = true;
+        } else if (!"WHITE".equalsIgnoreCase(playerColor) && !"BLACK".equalsIgnoreCase(playerColor)) {
+            // Logic for observer
+        } else {
+            throw new AlreadyTakenException("Requested player slot is already taken."); // Check with the TAs if this is needed
+        }
+
+        if (updateNeeded) {
+            gameDao.updateGame(gameId, game);
+        }
     }
-
-    public void updateGame(GameData game) throws DataAccessException{
-        gameDao.updateGame(game.gameID(), game);
-    }
-
-    public void deleteGame(int gameId) throws DataAccessException{
-        gameDao.deleteGame(gameId);
-    }
-
-
-
-
-
-    public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
-    }
-
 }
 

@@ -83,7 +83,12 @@ public class UserService {
         return Long.toHexString(Double.doubleToLongBits(Math.random()));
     }
 
-    public void clear(){
-        userDao.clear();
+    public void clear() throws DataAccessException{
+        try {
+            userDao.clear();
+        } catch (Exception e) {
+            throw new DataAccessException("An error occurred while Clearing: " + e.getMessage());
+        }
+
     }
 }

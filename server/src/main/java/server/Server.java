@@ -79,11 +79,9 @@ public class Server {
             res.status(200);
             return gson.toJson(authData);
         } catch (UnauthorizedException e) {
-            // Handling unauthorized access (wrong username/password)
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            // Handling internal server errors, such as database access issues
             res.status(500);
             return gson.toJson(Map.of("message", "Error: description"));
         } catch (Exception e) {
@@ -97,14 +95,12 @@ public class Server {
         try {
             String authToken = req.headers("Authorization");
             userService.logout(authToken);
-            res.status(200); // HTTP 200 OK
+            res.status(200);
             return "Logout successful";
         } catch (UnauthorizedException e) {
-            // Handling unauthorized access (wrong username/password)
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            // Handling internal server errors, such as database access issues
             res.status(500);
             return gson.toJson(Map.of("message", "Error: description"));
         } catch (Exception e) {
@@ -145,7 +141,6 @@ public class Server {
             res.status(200); // HTTP 200 OK
             return gson.toJson(Map.of("games", games));
         } catch (UnauthorizedException e) {
-            // Handling unauthorized access (wrong username/password)
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
@@ -158,23 +153,45 @@ public class Server {
         }
     }
 
-    private Object joinGame(Request req, Response res) throws DataAccessException{
-        String authToken = req.headers("Authorization");
-        GameData joinGameData = gson.fromJson(req.body(), GameData.class);
-        gameService.joinGame(authToken, joinGameData);
-        res.status(200); // HTTP 200 OK
-        return "Join game successful";
+    private Object joinGame(Request req, Response res) {
+        res.type("application/json");
+        try {
+            String authToken = req.headers("Authorization");
+            GameData joinGameData = gson.fromJson(req.body(), GameData.class);
+            int gameId = joinGameData.gameID();
+            String playerColor = req.queryParams("playerColor");
+            gameService.joinGame(authToken, gameId, playerColor);
+            res.status(200);
+            return gson.toJson(Map.of("message", "Join game successful"));
+
+        } catch (UnauthorizedException e) {
+            res.status(401); // Unauthorized
+            return gson.toJson(Map.of("message", "Error: unauthorized"));
+        } catch (BadRequestException e) {
+            res.status(400); // Bad Request
+            return gson.toJson(Map.of("message", "Error: bad request - " + e.getMessage()));
+        } catch (AlreadyTakenException e) {
+            res.status(403); // Forbidden, slot already taken
+            return gson.toJson(Map.of("message", "Error: already taken"));
+        } catch (DataAccessException e) {
+            res.status(500); // Internal Server Error
+            return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+        } catch (Exception e) {
+            res.status(500); // Catching any other unexpected exceptions
+            return gson.toJson(Map.of("message", "An unexpected error occurred - " + e.getMessage()));
+        }
+
     }
 
     private Object clear(Request req, Response res) {
+        res.type("application/json");
         try {
             userService.clear();
             gameService.clear();
             authService.clear();
-            res.status(200); // HTTP 200 OK
-            return "All data cleared";
+            res.status(200);
+            return "";
         } catch (DataAccessException e) {
-            // Handling internal server errors, such as database access issues
             res.status(500);
             return gson.toJson(Map.of("message", "Error: description"));
         } catch (Exception e) {
