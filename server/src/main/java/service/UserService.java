@@ -20,28 +20,26 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws DataAccessException, BadRequestException, AlreadyTakenException {
-        // Validate the input data for null values or empty strings
-        if (user == null || user.username() == null || user.username().trim().isEmpty() ||
-                user.password() == null || user.password().trim().isEmpty() ||
-                user.email() == null || user.email().trim().isEmpty()) {
+        if (user == null || user.username() == null || user.username().isEmpty() ||
+                user.password() == null || user.password().isEmpty() ||
+                user.email() == null || user.email().isEmpty()) {
             throw new BadRequestException("Username, password, and email cannot be empty.");
         }
 
-        // Check if the user already exists
         UserData existingUser = userDao.getUser(user.username());
         if (existingUser != null) {
             throw new AlreadyTakenException("User already exists.");
         }
 
-        // Insert the new user
         try {
             userDao.insertUser(user);
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             throw new DataAccessException("Failed to insert the new user: " + e.getMessage());
         }
 
         // Generate auth token and return
-        AuthData newAuthData = new AuthData(generateAuthToken(), user.username());
+        //AuthData newAuthData = new AuthData(generateAuthToken(), user.username());
+        AuthData newAuthData = authDao.insertAuthToken(user);
         return newAuthData;
     }
 
@@ -59,9 +57,7 @@ public class UserService {
         }
 
         try {
-            // User is authenticated, generate and return a new authToken
-            String authToken = generateAuthToken();
-            return new AuthData(authToken, user.username());
+            return authDao.insertAuthToken(user);
         } catch (Exception e) {
             throw new DataAccessException("An error occurred while logging in: " + e.getMessage());
         }
@@ -86,6 +82,7 @@ public class UserService {
     public void clear() throws DataAccessException{
         try {
             userDao.clear();
+            authDao.clear();
         } catch (Exception e) {
             throw new DataAccessException("An error occurred while Clearing: " + e.getMessage());
         }

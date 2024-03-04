@@ -4,17 +4,20 @@ import model.AuthData;
 import java.util.HashMap;
 import java.util.Map;
 import dataAccess.exceptions.DataAccessException;
+import model.UserData;
 
 public class AuthDao implements IAuthDao {
     private Map<String, AuthData> tokens = new HashMap<>();
 
     @Override
-    public void insertAuthToken(AuthData authToken) throws DataAccessException {
-        try {
-            tokens.put(authToken.authToken(), authToken);
-        } catch (Exception e) {
-            throw new DataAccessException("Failed to insert auth token: " + e.getMessage());
+    public AuthData insertAuthToken(UserData user) throws DataAccessException {
+        if (user.username() == null || user.username().isEmpty()) {
+            throw new DataAccessException("Failed to insert auth token");
         }
+        String authToken = generateAuthToken();
+        AuthData newAuth = new AuthData(authToken, user.username());
+        tokens.put(authToken, newAuth);
+        return newAuth;
     }
 
     @Override
@@ -28,13 +31,11 @@ public class AuthDao implements IAuthDao {
 
     @Override
     public void deleteAuthToken(String authToken) throws DataAccessException {
-        try {
-            if (tokens.remove(authToken) == null) {
-                throw new DataAccessException("Auth token not found: " + authToken);
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Failed to delete auth token: " + e.getMessage());
+        if (!tokens.containsKey(authToken)) {
+            throw new DataAccessException("Auth token not found");
         }
+        tokens.remove(authToken);
+
     }
 
     @Override
@@ -44,5 +45,9 @@ public class AuthDao implements IAuthDao {
         } catch (Exception e) {
             throw new DataAccessException("Failed to clear auth tokens: " + e.getMessage());
         }
+    }
+
+    private String generateAuthToken() {
+        return Long.toHexString(Double.doubleToLongBits(Math.random()));
     }
 }

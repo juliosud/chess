@@ -20,7 +20,7 @@ public class AuthService {
         AuthData newAuthData = new AuthData(token, username);
 
         // Insert the new token into the DAO
-        authDao.insertAuthToken(newAuthData);
+        //authDao.insertAuthToken(newAuthData);
         return newAuthData;
     }
 

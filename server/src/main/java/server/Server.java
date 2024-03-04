@@ -96,7 +96,7 @@ public class Server {
             String authToken = req.headers("Authorization");
             userService.logout(authToken);
             res.status(200);
-            return "Logout successful";
+            return "";
         } catch (UnauthorizedException e) {
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
@@ -188,7 +188,6 @@ public class Server {
         try {
             userService.clear();
             gameService.clear();
-            authService.clear();
             res.status(200);
             return "";
         } catch (DataAccessException e) {
