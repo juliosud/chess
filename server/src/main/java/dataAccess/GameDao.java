@@ -3,9 +3,7 @@ package dataAccess;
 import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
-
 import java.util.*;
-
 
 public class GameDao implements IGameDao {
     private final Map<Integer, GameData> games = new HashMap<>();
@@ -19,19 +17,13 @@ public class GameDao implements IGameDao {
     }
 
     @Override
-    public GameData getGame(int gameId) throws DataAccessException,BadRequestException {
-//        GameData game = games.get(gameId);
-//        if (game == null) {
-//            throw new DataAccessException("Game not found with ID: " + gameId);
-//        }
-//        return game;
+    public GameData getGame(int gameId) throws BadRequestException {
         try {
             GameData game = games.get(gameId);
             return game;
         } catch (Exception e){
             throw new BadRequestException("Invalid Id");
         }
-
     }
 
     @Override
@@ -49,14 +41,6 @@ public class GameDao implements IGameDao {
         }
     }
 
-//    @Override
-//    public List<GameData> listGames() throws DataAccessException {
-//        try {
-//            return new ArrayList<>(games.values());
-//        } catch (Exception e) {
-//            throw new DataAccessException("Failed to list games: " + e.getMessage());
-//        }
-//    }
     @Override
     public Collection<GameData> listGames () {
         return games.values();
@@ -71,17 +55,4 @@ public class GameDao implements IGameDao {
             throw new DataAccessException("Failed to clear games: " + e.getMessage());
         }
     }
-
-    @Override
-    public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
-        try {
-            // Placeholder for join game logic
-        } catch (Exception e) {
-            throw new DataAccessException("Failed to join game: " + e.getMessage());
-        }
-    }
-
-
-
 }
-

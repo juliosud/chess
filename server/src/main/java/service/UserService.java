@@ -37,7 +37,6 @@ public class UserService {
             throw new DataAccessException("Failed to insert the new user: " + e.getMessage());
         }
 
-        //AuthData newAuthData = new AuthData(generateAuthToken(), user.username());
         AuthData newAuthData = authDao.insertAuthToken(user);
         return newAuthData;
     }
@@ -45,7 +44,7 @@ public class UserService {
     public AuthData login(UserData user) throws DataAccessException, UnauthorizedException {
         if (user == null || user.username() == null || user.username().isEmpty()
                 || user.password() == null || user.password().isEmpty()) {
-            throw new UnauthorizedException("Username and password must be provided."); // unauthorized or bad request?
+            throw new UnauthorizedException("Username and password must be provided.");
         }
 
         UserData foundUser = userDao.getUser(user.username());
@@ -67,13 +66,8 @@ public class UserService {
         try {
             authDao.deleteAuthToken(authToken);
         } catch (Exception e) {
-            throw new DataAccessException("An error occurred while logging in: " + e.getMessage());
+            throw new DataAccessException("An error occurred while logging out. " + e.getMessage());
         }
-
-    }
-
-    private String generateAuthToken() {
-        return Long.toHexString(Double.doubleToLongBits(Math.random()));
     }
 
     public void clear() throws DataAccessException{
@@ -83,6 +77,5 @@ public class UserService {
         } catch (Exception e) {
             throw new DataAccessException("An error occurred while Clearing: " + e.getMessage());
         }
-
     }
 }

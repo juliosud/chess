@@ -35,7 +35,6 @@ public class AuthDao implements IAuthDao {
             throw new DataAccessException("Auth token not found");
         }
         tokens.remove(authToken);
-
     }
 
     @Override

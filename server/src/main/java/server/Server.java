@@ -11,21 +11,16 @@ import dataAccess.UserDao;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
-import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-
 
 public class Server {
     private final UserService userService;
-    private final AuthService authService;
     private final GameService gameService;
     private final Gson gson = new Gson();
 
@@ -33,9 +28,7 @@ public class Server {
         AuthDao authDao = new AuthDao();
         GameDao gameDao = new GameDao();
         UserDao userDao = new UserDao();
-
         this.userService = new UserService(userDao, authDao);
-        this.authService = new AuthService(authDao);
         this.gameService = new GameService(gameDao,authDao);
     }
 
@@ -108,7 +101,6 @@ public class Server {
             res.status(500);
             return gson.toJson(Map.of("message", "An unexpected error occurred"));
         }
-
     }
 
     private Object createGame(Request req, Response res) {
@@ -167,22 +159,21 @@ public class Server {
             return "";
 
         } catch (UnauthorizedException e) {
-            res.status(401); // Unauthorized
+            res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
         } catch (BadRequestException e) {
-            res.status(400); // Bad Request
+            res.status(400);
             return gson.toJson(Map.of("message", "Error: bad request - " + e.getMessage()));
         } catch (AlreadyTakenException e) {
-            res.status(403); // Forbidden, slot already taken
+            res.status(403);
             return gson.toJson(Map.of("message", "Error: already taken"));
         } catch (DataAccessException e) {
-            res.status(500); // Internal Server Error
+            res.status(500);
             return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
         } catch (Exception e) {
-            res.status(500); // Catching any other unexpected exceptions
+            res.status(500);
             return gson.toJson(Map.of("message", "An unexpected error occurred - " + e.getMessage()));
         }
-
     }
 
     private Object clear(Request req, Response res) {
@@ -205,5 +196,4 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-
 }

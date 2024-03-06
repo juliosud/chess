@@ -10,7 +10,6 @@ import model.GameData;
 import model.AuthData;
 
 import java.util.Collection;
-import java.util.List;
 
 public class GameService {
     private final IGameDao gameDao;
@@ -22,18 +21,17 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    public Integer createGame(String authToken, GameData gameName) throws DataAccessException, UnauthorizedException, BadRequestException {
+    public Integer createGame(String authToken, GameData gameData) throws DataAccessException, UnauthorizedException, BadRequestException {
         if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
             throw new UnauthorizedException("Invalid or expired authToken.");
         }
-        if (gameName == null || gameName.gameName() == null || gameName.gameName().isEmpty()) {
-            throw new BadRequestException("Game name cannot be empty.");        }
+        if (gameData == null || gameData.gameName() == null || gameData.gameName().isEmpty()) {
+            throw new BadRequestException("Game name cannot be empty.");
+        }
 
-//        GameData game = new GameData(0, null, null, gameName.gameName());
         int gameId;
-
         try {
-            gameId = gameDao.insertGame(gameName);
+            gameId = gameDao.insertGame(gameData);
         } catch (Exception e) {
             throw new DataAccessException("Failed to create a new game: " + e.getMessage());
         }
@@ -51,17 +49,15 @@ public class GameService {
         }
     }
 
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         try {
             gameDao.clear();
         } catch (Exception e) {
             throw new DataAccessException("Fail to clear: " + e.getMessage());
         }
-
     }
 
     public void joinGame(String authToken, int gameId, String playerColor) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
-        // Validate the authToken and retrieve associated AuthData
         AuthData auth = authDao.getAuthToken(authToken);
         if (auth == null || !auth.authToken().equals(authToken)) {
             throw new UnauthorizedException("Invalid auth token");
@@ -76,7 +72,6 @@ public class GameService {
             if (("WHITE".equals(playerColor) && game.whiteUsername() != null) || ("BLACK".equals(playerColor) && game.blackUsername() != null)) {
                 throw new AlreadyTakenException("Color is already taken");
             }
-
             if ("WHITE".equals(playerColor)) {
                 gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName()));
             } else if ("BLACK".equals(playerColor)) {
@@ -84,11 +79,8 @@ public class GameService {
             } else {
                 throw new BadRequestException("Wrong Color");
             }
-
         } else {
             return;
         }
     }
-
 }
-
