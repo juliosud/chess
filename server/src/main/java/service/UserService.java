@@ -37,20 +37,17 @@ public class UserService {
             throw new DataAccessException("Failed to insert the new user: " + e.getMessage());
         }
 
-        // Generate auth token and return
         //AuthData newAuthData = new AuthData(generateAuthToken(), user.username());
         AuthData newAuthData = authDao.insertAuthToken(user);
         return newAuthData;
     }
 
     public AuthData login(UserData user) throws DataAccessException, UnauthorizedException {
-        // Validate input
         if (user == null || user.username() == null || user.username().isEmpty()
                 || user.password() == null || user.password().isEmpty()) {
-            throw new UnauthorizedException("Username and password must be provided.");
+            throw new UnauthorizedException("Username and password must be provided."); // unauthorized or bad request?
         }
 
-        // Attempt to retrieve the user
         UserData foundUser = userDao.getUser(user.username());
         if (foundUser == null || !foundUser.password().equals(user.password())) {
             throw new UnauthorizedException("Invalid username or password.");

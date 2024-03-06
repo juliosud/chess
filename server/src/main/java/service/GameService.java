@@ -9,11 +9,13 @@ import dataAccess.exceptions.UnauthorizedException;
 import model.GameData;
 import model.AuthData;
 
+import java.util.Collection;
 import java.util.List;
 
 public class GameService {
     private final IGameDao gameDao;
     private final IAuthDao authDao;
+
 
     public GameService(IGameDao gameDao, IAuthDao authDao) {
         this.gameDao = gameDao;
@@ -27,19 +29,18 @@ public class GameService {
         if (gameName == null || gameName.gameName() == null || gameName.gameName().isEmpty()) {
             throw new BadRequestException("Game name cannot be empty.");        }
 
-        GameData game = new GameData(0, null, null, gameName.gameName());
+//        GameData game = new GameData(0, null, null, gameName.gameName());
         int gameId;
 
         try {
-            gameId = gameDao.insertGame(game);
+            gameId = gameDao.insertGame(gameName);
         } catch (Exception e) {
             throw new DataAccessException("Failed to create a new game: " + e.getMessage());
         }
-
         return gameDao.getGame(gameId).gameID();
     }
 
-    public List<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
+    public Collection<GameData> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
             throw new UnauthorizedException("Invalid or expired authToken.");
         }
@@ -77,7 +78,7 @@ public class GameService {
             game = new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName()); // Same assumption as above
             updateNeeded = true;
         } else if (!"WHITE".equalsIgnoreCase(playerColor) && !"BLACK".equalsIgnoreCase(playerColor)) {
-            // Logic for observer
+            return;
         } else {
             throw new AlreadyTakenException("Requested player slot is already taken."); // Check with the TAs if this is needed
         }

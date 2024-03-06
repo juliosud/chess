@@ -3,19 +3,16 @@ package dataAccess;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
+
 
 public class GameDao implements IGameDao {
     private final Map<Integer, GameData> games = new HashMap<>();
-    private final AtomicInteger gameIdCounter = new AtomicInteger();
+    private int gameIdCounter = 1;
 
     @Override
     public int insertGame(GameData game) {
-        int gameId = gameIdCounter.incrementAndGet();
+        int gameId = gameIdCounter++;
         games.put(gameId, new GameData(gameId, game.whiteUsername(), game.blackUsername(), game.gameName()));
         return gameId;
     }
@@ -44,21 +41,24 @@ public class GameDao implements IGameDao {
         }
     }
 
+//    @Override
+//    public List<GameData> listGames() throws DataAccessException {
+//        try {
+//            return new ArrayList<>(games.values());
+//        } catch (Exception e) {
+//            throw new DataAccessException("Failed to list games: " + e.getMessage());
+//        }
+//    }
     @Override
-    public List<GameData> listGames() throws DataAccessException {
-        try {
-            return new ArrayList<>(games.values());
-        } catch (Exception e) {
-            throw new DataAccessException("Failed to list games: " + e.getMessage());
-        }
+    public Collection<GameData> listGames () {
+        return games.values();
     }
 
     @Override
     public void clear() throws DataAccessException {
         try {
-            // Similarly, clearing the data store might fail in a real database scenario.
             games.clear();
-            gameIdCounter.set(0);
+            gameIdCounter = 1;
         } catch (Exception e) {
             throw new DataAccessException("Failed to clear games: " + e.getMessage());
         }
@@ -68,7 +68,6 @@ public class GameDao implements IGameDao {
     public void joinGame(int gameId, String username, String playerColor) throws DataAccessException {
         try {
             // Placeholder for join game logic
-            // Throw DataAccessException on failure
         } catch (Exception e) {
             throw new DataAccessException("Failed to join game: " + e.getMessage());
         }

@@ -18,6 +18,7 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +118,7 @@ public class Server {
             GameData gameData = gson.fromJson(req.body(), GameData.class);
             Integer createdGame = gameService.createGame(authToken, gameData);
             res.status(200);
-            return gson.toJson(createdGame);
+            return gson.toJson(Map.of("gameID", createdGame));
         } catch (UnauthorizedException e) {
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
@@ -137,14 +138,13 @@ public class Server {
         res.type("application/json");
         try {
             String authToken = req.headers("Authorization");
-            List<GameData> games = gameService.listGames(authToken);
+            Collection<GameData> games = gameService.listGames(authToken);
             res.status(200); // HTTP 200 OK
             return gson.toJson(Map.of("games", games));
         } catch (UnauthorizedException e) {
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
         } catch (DataAccessException e) {
-            // Handling internal server errors, such as database access issues
             res.status(500);
             return gson.toJson(Map.of("message", "Error: description"));
         } catch (Exception e) {
