@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 
@@ -8,8 +9,8 @@ import java.util.List;
 
 public interface IGameDao {
     int insertGame(GameData game) throws DataAccessException;
-    GameData getGame(int gameId)  throws DataAccessException;
-    void updateGame(int gameId, GameData game) throws DataAccessException;
+    public GameData getGame(int gameId) throws DataAccessException, BadRequestException;
+    public void updateGame(GameData game) throws DataAccessException;
     void deleteGame(int gameId)  throws DataAccessException;
     Collection<GameData> listGames() throws DataAccessException;
     void clear()throws DataAccessException;

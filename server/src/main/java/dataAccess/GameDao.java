@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 
@@ -18,20 +19,27 @@ public class GameDao implements IGameDao {
     }
 
     @Override
-    public GameData getGame(int gameId) throws DataAccessException {
-        GameData game = games.get(gameId);
-        if (game == null) {
-            throw new DataAccessException("Game not found with ID: " + gameId);
+    public GameData getGame(int gameId) throws DataAccessException,BadRequestException {
+//        GameData game = games.get(gameId);
+//        if (game == null) {
+//            throw new DataAccessException("Game not found with ID: " + gameId);
+//        }
+//        return game;
+        try {
+            GameData game = games.get(gameId);
+            return game;
+        } catch (Exception e){
+            throw new BadRequestException("Invalid Id");
         }
-        return game;
+
     }
 
     @Override
-    public void updateGame(int gameId, GameData game) throws DataAccessException {
-        if (!games.containsKey(gameId)) {
-            throw new DataAccessException("Cannot update non-existing game with ID: " + gameId);
+    public void updateGame(GameData game) throws DataAccessException {
+        if (!games.containsKey(game.gameID())) {
+            throw new DataAccessException("Cannot update non-existing game with ID: " + game.gameID());
         }
-        games.put(gameId, game);
+        games.put(game.gameID(), game);
     }
 
     @Override

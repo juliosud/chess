@@ -157,12 +157,14 @@ public class Server {
         res.type("application/json");
         try {
             String authToken = req.headers("Authorization");
+            String body = req.body();
+            Map<String, Object> bodyMap = gson.fromJson(body, Map.class);
             GameData joinGameData = gson.fromJson(req.body(), GameData.class);
             int gameId = joinGameData.gameID();
-            String playerColor = req.queryParams("playerColor");
+            String playerColor = (String) bodyMap.get("playerColor");
             gameService.joinGame(authToken, gameId, playerColor);
             res.status(200);
-            return gson.toJson(Map.of("message", "Join game successful"));
+            return "";
 
         } catch (UnauthorizedException e) {
             res.status(401); // Unauthorized

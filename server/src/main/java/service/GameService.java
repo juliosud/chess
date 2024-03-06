@@ -60,32 +60,35 @@ public class GameService {
 
     }
 
-    public void joinGame(String authToken, int gameId, String playerColor) throws DataAccessException, UnauthorizedException, BadRequestException, AlreadyTakenException {
-        if (authToken == null || authToken.isEmpty() || authDao.getAuthToken(authToken) == null) {
-            throw new UnauthorizedException("Invalid or expired authToken.");
+    public void joinGame(String authToken, int gameId, String playerColor) throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
+        // Validate the authToken and retrieve associated AuthData
+        AuthData auth = authDao.getAuthToken(authToken);
+        if (auth == null || !auth.authToken().equals(authToken)) {
+            throw new UnauthorizedException("Invalid auth token");
         }
-        AuthData user = authDao.getAuthToken(authToken);
+
         GameData game = gameDao.getGame(gameId);
         if (game == null) {
-            throw new BadRequestException("Game not found with ID: " + gameId);
+            throw new BadRequestException("Game not found");
         }
 
-        boolean updateNeeded = false;
-        if ("WHITE".equalsIgnoreCase(playerColor) && (game.whiteUsername() == null || game.whiteUsername().isEmpty())) {
-            game = new GameData(game.gameID(), user.username(), game.blackUsername(), game.gameName()); // Assuming authToken or a user identifier from authToken is used as username
-            updateNeeded = true;
-        } else if ("BLACK".equalsIgnoreCase(playerColor) && (game.blackUsername() == null || game.blackUsername().isEmpty())) {
-            game = new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName()); // Same assumption as above
-            updateNeeded = true;
-        } else if (!"WHITE".equalsIgnoreCase(playerColor) && !"BLACK".equalsIgnoreCase(playerColor)) {
-            return;
+        if (playerColor != null) {
+            if (("WHITE".equals(playerColor) && game.whiteUsername() != null) || ("BLACK".equals(playerColor) && game.blackUsername() != null)) {
+                throw new AlreadyTakenException("Color is already taken");
+            }
+
+            if ("WHITE".equals(playerColor)) {
+                gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName()));
+            } else if ("BLACK".equals(playerColor)) {
+                gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName()));
+            } else {
+                throw new BadRequestException("Wrong Color");
+            }
+
         } else {
-            throw new AlreadyTakenException("Requested player slot is already taken."); // Check with the TAs if this is needed
-        }
-
-        if (updateNeeded) {
-            gameDao.updateGame(gameId, game);
+            return;
         }
     }
+
 }
 
