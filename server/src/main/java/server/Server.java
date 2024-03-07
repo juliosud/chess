@@ -55,7 +55,7 @@ public class Server {
             return gson.toJson(authData);
         } catch (BadRequestException e) {
             res.status(400);
-            return gson.toJson(Map.of("message", "Error: bad request"));
+            return gson.toJson(Map.of("message", "Error: bad request."));
         } catch (AlreadyTakenException e) {
             res.status(403);
             return gson.toJson(Map.of("message", "Error: already taken"));
