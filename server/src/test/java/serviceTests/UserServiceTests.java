@@ -1,4 +1,4 @@
-package java.passoffTests.serverTests;
+package serviceTests;
 
 import dataAccess.*;
 import dataAccess.exceptions.*;
