@@ -69,26 +69,6 @@ public class ChessBoard {
         }
     }
 
-
-    /**
-     * Creates a deep copy of this ChessBoard.
-     * @return A new ChessBoard instance with the same piece arrangement.
-     */
-    public ChessBoard deepCopy() {
-        ChessBoard newBoard = new ChessBoard();
-        for (int i = 0; i < squares.length; i++) {
-            for (int j = 0; j < squares[i].length; j++) {
-                ChessPiece originalPiece = this.squares[i][j];
-                if (originalPiece != null) {
-                    // Assuming ChessPiece has a copy constructor or clone method.;
-                    // If not, and if ChessPiece is immutable, you can directly assign the instance.
-                    newBoard.squares[i][j] = originalPiece;
-                }
-            }
-        }
-        return newBoard;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
