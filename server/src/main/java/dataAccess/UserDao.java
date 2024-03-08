@@ -30,17 +30,6 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public void deleteUser(String username) throws DataAccessException {
-        try {
-            if (users.remove(username) == null) {
-                throw new DataAccessException("No user found with username: " + username);
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Failed to delete user: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void clear() throws DataAccessException {
         try {
             users.clear();

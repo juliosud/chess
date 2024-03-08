@@ -35,13 +35,6 @@ public class GameDao implements IGameDao {
     }
 
     @Override
-    public void deleteGame(int gameId) throws DataAccessException {
-        if (games.remove(gameId) == null) {
-            throw new DataAccessException("Cannot delete non-existing game with ID: " + gameId);
-        }
-    }
-
-    @Override
     public Collection<GameData> listGames () {
         return games.values();
     }
