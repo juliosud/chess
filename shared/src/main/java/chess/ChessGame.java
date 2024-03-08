@@ -96,7 +96,6 @@ public class ChessGame {
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
-
     /**
      * Determines if the given team is in check
      *
@@ -125,7 +124,6 @@ public class ChessGame {
         }
         return false;
     }
-
 
     private ChessPosition findKingPosition(TeamColor teamColor) {
         for (int row = 0; row < 8; row++) {
@@ -168,7 +166,6 @@ public class ChessGame {
         return true;
     }
 
-
     public boolean simulateMoveAndCheck(ChessMove move, TeamColor teamColor) {
         ChessPiece originalPieceAtEnd = board.getPiece(move.getEndPosition());
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
@@ -183,7 +180,6 @@ public class ChessGame {
 
         return isInCheckAfterMove;
     }
-
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
