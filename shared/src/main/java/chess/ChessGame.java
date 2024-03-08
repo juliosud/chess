@@ -19,14 +19,6 @@ public class ChessGame {
         this.board.resetBoard();
     }
 
-
-    /**
-     * @return Which team's turn it is
-     */
-    public TeamColor getTeamTurn() {
-        return teamTurn;
-    }
-
     /**
      * Set's which teams turn it is
      *
@@ -149,6 +141,10 @@ public class ChessGame {
             return false;
         }
 
+        return forRowInRowsCheckMate(teamColor);
+    }
+
+    private boolean forRowInRowsCheckMate(TeamColor teamColor) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPosition position = new ChessPosition(row + 1, col + 1);
@@ -193,21 +189,7 @@ public class ChessGame {
             return false;
         }
 
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                ChessPosition position = new ChessPosition(row + 1, col + 1);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves) {
-                        if (!simulateMoveAndCheck(move, teamColor)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
+        return forRowInRowsCheckMate(teamColor);
     }
 
     /**
