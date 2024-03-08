@@ -10,7 +10,6 @@ public interface IGameDao {
     int insertGame(GameData game) throws DataAccessException;
     public GameData getGame(int gameId) throws BadRequestException;
     public void updateGame(GameData game) throws DataAccessException;
-    void deleteGame(int gameId)  throws DataAccessException;
     Collection<GameData> listGames() throws DataAccessException;
     void clear()throws DataAccessException;
 }

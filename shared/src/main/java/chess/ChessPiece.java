@@ -125,9 +125,9 @@ public class ChessPiece {
                 moves.add(new ChessMove(myPosition, newPosition, null));
             }
             if (myPosition.getRow() == startRow){
-                int ForwardRowTwo = myPosition.getRow() + 2 * direction;
+                int forwardRowTwo = myPosition.getRow() + 2 * direction;
 
-                ChessPosition newPositionTwo = new ChessPosition(ForwardRowTwo, col);
+                ChessPosition newPositionTwo = new ChessPosition(forwardRowTwo, col);
                 ChessPiece pieceAtDestinationTwo = board.getPiece(newPositionTwo);
 
                 if (pieceAtDestinationTwo == null){
