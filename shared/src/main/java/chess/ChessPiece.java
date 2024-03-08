@@ -137,7 +137,6 @@ public class ChessPiece {
         }
     }
 
-
     private void addRookMoves(Collection<ChessMove> moves, ChessBoard board, ChessPosition myPosition) {
         //moves
         int[][] rookMoves = {

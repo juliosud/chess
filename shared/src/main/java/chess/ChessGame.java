@@ -27,7 +27,6 @@ public class ChessGame {
         return teamTurn;
     }
 
-
     /**
      * Set's which teams turn it is
      *
@@ -37,7 +36,6 @@ public class ChessGame {
         this.teamTurn = team;
     }
 
-
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -45,7 +43,6 @@ public class ChessGame {
         WHITE,
         BLACK
     }
-
 
     /**
      * Gets a valid moves for a piece at the given location
@@ -89,16 +86,13 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid move.");
         }
 
-        //if all exceptions arent thrown, then execute the move
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
 
-        // Check for pawn promotion
         if (move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
         }
 
-        // Switch turns
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
@@ -112,7 +106,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = findKingPosition(teamColor);
         if (kingPosition == null){
-            return false; // King is not found
+            return false;
         }
 
         for (int row = 0 ; row < 8 ; row++){
@@ -146,7 +140,6 @@ public class ChessGame {
         return null;
     }
 
-
     /**
      * Determines if the given team is in checkmate
      *
@@ -155,7 +148,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {
-            return false; // In check, so cannot be stalemate
+            return false;
         }
 
         for (int row = 0; row < 8; row++) {
@@ -221,7 +214,6 @@ public class ChessGame {
         return true;
     }
 
-
     /**
      * Sets this game's chessboard with a given board
      *
@@ -230,7 +222,6 @@ public class ChessGame {
     public void setBoard(ChessBoard board) {
         this.board = board;
     }
-
 
     /**
      * Gets the current chessboard
@@ -241,7 +232,6 @@ public class ChessGame {
         return this.board;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -249,7 +239,6 @@ public class ChessGame {
         ChessGame chessGame = (ChessGame) o;
         return Objects.equals(board, chessGame.board) && teamTurn == chessGame.teamTurn;
     }
-
 
     @Override
     public int hashCode() {
