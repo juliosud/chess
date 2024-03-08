@@ -172,23 +172,19 @@ public class ChessGame {
                 }
             }
         }
-        return true; // No legal moves available
+        return true;
     }
 
 
     public boolean simulateMoveAndCheck(ChessMove move, TeamColor teamColor) {
-        // Save the original state
         ChessPiece originalPieceAtEnd = board.getPiece(move.getEndPosition());
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
 
-        // Perform the move
         board.addPiece(move.getEndPosition(), movingPiece);
         board.addPiece(move.getStartPosition(), null);
 
-        // Check for check status
         boolean isInCheckAfterMove = isInCheck(teamColor);
 
-        // Revert the move to original state
         board.addPiece(move.getStartPosition(), movingPiece);
         board.addPiece(move.getEndPosition(), originalPieceAtEnd);
 
@@ -205,7 +201,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {
-            return false; // Can't be stalemate if in check
+            return false;
         }
 
         for (int row = 0; row < 8; row++) {
