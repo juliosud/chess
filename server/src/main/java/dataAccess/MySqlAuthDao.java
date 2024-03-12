@@ -23,7 +23,7 @@ public class MySqlAuthDao implements IAuthDao {
         try {
             configureDatabase(createTableSQL);
         } catch (DataAccessException e) {
-            throw new RuntimeException("Failed to create auth table: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to create authData table: " + e.getMessage(), e);
         }
     }
 
