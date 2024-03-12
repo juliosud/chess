@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
     private UserService userService;
     private UserDao userDao;
-    private AuthDao authDao;
+    private MySqlAuthDao authDao;
 
     @BeforeEach
     void setup() {
         userDao = new UserDao();
-        authDao = new AuthDao();
+        authDao = new MySqlAuthDao();
         userService = new UserService(userDao, authDao);
     }
 

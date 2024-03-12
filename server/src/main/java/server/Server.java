@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthDao;
+import dataAccess.MySqlAuthDao;
 import dataAccess.exceptions.AlreadyTakenException;
 import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
@@ -25,7 +25,7 @@ public class Server {
     private final Gson gson = new Gson();
 
     public Server() {
-        AuthDao authDao = new AuthDao();
+        MySqlAuthDao authDao = new MySqlAuthDao();
         GameDao gameDao = new GameDao();
         UserDao userDao = new UserDao();
         this.userService = new UserService(userDao, authDao);

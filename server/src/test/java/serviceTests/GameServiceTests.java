@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTests {
     private GameService gameService;
     private UserService userService;
-    private AuthDao authDao;
+    private MySqlAuthDao authDao;
     private GameDao gameDao;
     private UserDao userDao;
 
@@ -23,7 +23,7 @@ public class GameServiceTests {
     void setup() {
         userDao = new UserDao();
         gameDao = new GameDao();
-        authDao = new AuthDao();
+        authDao = new MySqlAuthDao();
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
     }
