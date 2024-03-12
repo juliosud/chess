@@ -74,7 +74,7 @@ public class MySqlGameDao implements IGameDao {
         String whiteUsername = rs.getString("whiteUsername");
         String blackUsername = rs.getString("blackUsername");
         String gameName = rs.getString("gameName");
-        ChessGame gameStatus = gson.fromJson(rs.getString("game"), ChessGame.class);
+        //ChessGame gameStatus = gson.fromJson(rs.getString("game"), ChessGame.class);
         return new GameData(gameID, whiteUsername, blackUsername, gameName);
     }
 
@@ -95,7 +95,7 @@ public class MySqlGameDao implements IGameDao {
                 games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName")));
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to list games", e);
+            throw new DataAccessException("Unable to list games");
         }
         return games;
     }

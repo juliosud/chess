@@ -3,7 +3,6 @@ package dataAccess;
 import dataAccess.exceptions.DataAccessException;
 import model.UserData;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
