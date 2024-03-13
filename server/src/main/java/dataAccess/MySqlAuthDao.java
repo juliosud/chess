@@ -21,7 +21,7 @@ public class MySqlAuthDao implements IAuthDao {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """};
         try {
-            DatabaseManager.configureDatabase(createTableSQL);
+            configureDatabase(createTableSQL);
         } catch (DataAccessException e) {
             throw new RuntimeException("Failed to create authData table: " + e.getMessage(), e);
         }
@@ -67,9 +67,9 @@ public class MySqlAuthDao implements IAuthDao {
              PreparedStatement stmt = conn.prepareStatement(deleteSQL)) {
             stmt.setString(1, authToken);
             int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new DataAccessException("Auth token not found: " + authToken);
-            }
+//            if (affectedRows == 0) {
+//                throw new DataAccessException("Auth token not found: " + authToken);
+//            }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to delete auth token: " + e.getMessage());
         }
