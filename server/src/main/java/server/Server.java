@@ -1,13 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.MySqlAuthDao;
+import dataAccess.*;
 import dataAccess.exceptions.AlreadyTakenException;
 import dataAccess.exceptions.BadRequestException;
 import dataAccess.exceptions.DataAccessException;
 import dataAccess.exceptions.UnauthorizedException;
-import dataAccess.GameDao;
-import dataAccess.UserDao;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
@@ -26,8 +24,9 @@ public class Server {
 
     public Server() {
         MySqlAuthDao authDao = new MySqlAuthDao();
-        GameDao gameDao = new GameDao();
-        UserDao userDao = new UserDao();
+        MySqlGameDao gameDao = new MySqlGameDao();
+        MySqlUserDao userDao = new MySqlUserDao();
+
         this.userService = new UserService(userDao, authDao);
         this.gameService = new GameService(gameDao,authDao);
     }

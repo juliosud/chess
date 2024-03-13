@@ -48,7 +48,7 @@ public class UserService {
         }
 
         UserData foundUser = userDao.getUser(user.username());
-        if (foundUser == null || !foundUser.password().equals(user.password())) {
+        if (foundUser == null || !userDao.decoder(user, user.password())) {
             throw new UnauthorizedException("Invalid username or password.");
         }
 

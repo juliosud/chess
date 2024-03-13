@@ -37,4 +37,10 @@ public class UserDao implements IUserDao {
             throw new DataAccessException("Failed to clear users: " + e.getMessage());
         }
     }
+
+    @Override
+    public boolean decoder(UserData user, String password) throws DataAccessException {
+        return false;
+    }
+
 }

@@ -1,6 +1,5 @@
 package dataAccess;
 
-import chess.ChessGame;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 import java.sql.*;
@@ -8,18 +7,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import static dataAccess.DatabaseManager.configureDatabase;
 import static dataAccess.DatabaseManager.executeUpdate;
-import com.google.gson.Gson;
 
 public class MySqlGameDao implements IGameDao {
 
-    public MySqlGameDao() throws DataAccessException {
+    public MySqlGameDao() {
         String[] createTableSQL = {"""
-            CREATE TABLE IF NOT EXISTS game (
+            CREATE TABLE IF NOT EXISTS gameData (
                 `gameId` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                `whiteUsername` VARCHAR(255) NOT NULL,
-                `blackUsername` VARCHAR(255) NOT NULL,
-                `gameName` VARCHAR(255) NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+                `whiteUsername` VARCHAR(255) NULL,
+                `blackUsername` VARCHAR(255) NULL,
+                `gameName` VARCHAR(255) NOT NULL,
+                `gameStatus` VARCHAR(255) NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             """};
         try {
             configureDatabase(createTableSQL);
@@ -35,26 +34,9 @@ public class MySqlGameDao implements IGameDao {
         return gameId;
     }
 
-//    @Override
-//    public GameData getGame(int gameId) throws DataAccessException {
-//        String selectSQL = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData WHERE gameId = ?;";
-//        try (Connection conn = DatabaseManager.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(selectSQL)) {
-//            ps.setInt(1, gameId);
-//            try (ResultSet rs = ps.executeQuery()) {
-//                if (rs.next()) {
-//                    return new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"));
-//                }
-//            }
-//        } catch (SQLException e) {
-//            throw new DataAccessException("Unable to get game with ID: " + gameId, e);
-//        }
-//        return null;
-//    }
-
     public GameData getGame(int gameId) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData WHERE gameId = ?;";
+            String statement = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData WHERE gameId = ?;"; // Check with TA if I need to return game status
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameId);
                 try (var rs = ps.executeQuery()) {
@@ -80,14 +62,14 @@ public class MySqlGameDao implements IGameDao {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        String updateSQL = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ? WHERE gameId = ?;";
+        String updateSQL = "UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ? WHERE gameId = ?;";
         executeUpdate(updateSQL, game.whiteUsername(), game.blackUsername(), game.gameName(), game.gameID());
     }
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         Collection<GameData> games = new ArrayList<>();
-        String selectSQL = "SELECT gameId, whiteUsername, blackUsername, gameName FROM game;";
+        String selectSQL = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData;";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(selectSQL);
              ResultSet rs = ps.executeQuery()) {
@@ -102,7 +84,7 @@ public class MySqlGameDao implements IGameDao {
 
     @Override
     public void clear() throws DataAccessException {
-        String truncateSQL = "TRUNCATE game;";
+        String truncateSQL = "TRUNCATE gameData;";
         executeUpdate(truncateSQL);
     }
 }

@@ -14,14 +14,14 @@ public class MySqlAuthDao implements IAuthDao {
 
     public MySqlAuthDao() {
         String[] createTableSQL = {"""
-            CREATE TABLE IF NOT EXISTS auth (
+            CREATE TABLE IF NOT EXISTS authData (
                 `username` VARCHAR(255) NOT NULL,
                 `authToken` VARCHAR(255) NOT NULL,
                 PRIMARY KEY (`authToken`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """};
         try {
-            configureDatabase(createTableSQL);
+            DatabaseManager.configureDatabase(createTableSQL);
         } catch (DataAccessException e) {
             throw new RuntimeException("Failed to create authData table: " + e.getMessage(), e);
         }

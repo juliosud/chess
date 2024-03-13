@@ -53,7 +53,7 @@ public class DatabaseManager {
     }
 
     static void configureDatabase (String[] createStatements) throws DataAccessException {
-        DatabaseManager.createDatabase();
+        createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
