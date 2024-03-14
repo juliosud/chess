@@ -66,10 +66,6 @@ public class MySqlAuthDao implements IAuthDao {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(deleteSQL)) {
             stmt.setString(1, authToken);
-            int affectedRows = stmt.executeUpdate();
-//            if (affectedRows == 0) {
-//                throw new DataAccessException("Auth token not found: " + authToken);
-//            }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to delete auth token: " + e.getMessage());
         }
