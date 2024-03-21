@@ -2,17 +2,18 @@ package ui;
 
 import model.AuthData;
 import model.UserData;
-import ui.ServerFacade;
 
 import java.util.Scanner;
 
 public class ChessClient {
     private ServerFacade serverFacade;
     private Scanner scanner;
+    private AuthData userToken;
 
     public ChessClient(ServerFacade serverFacade) {
         this.serverFacade = serverFacade;
         this.scanner = new Scanner(System.in);
+        this.userToken = null;
     }
 
     public void run() {
@@ -41,6 +42,7 @@ public class ChessClient {
                             UserData userData = new UserData(username, password,null);
                             AuthData authData = serverFacade.login(userData);
                             if (authData != null && authData.authToken() != null) {
+                                userToken = authData;
                                 loggedIn = true;
                                 System.out.println("Logged in successfully.");
                             } else {
@@ -63,6 +65,7 @@ public class ChessClient {
 
                             UserData newUser = new UserData(username, password, email);
                             AuthData authData = serverFacade.register(newUser);
+                            userToken = authData;
                             loggedIn = authData != null && authData.authToken() != null;
                             System.out.println("Registered and logged in successfully.");
                         } catch (Exception e) {
@@ -93,21 +96,23 @@ public class ChessClient {
                         System.out.println("join observer - Join as an observer in a game");
                         break;
                     case "logout":
-                        serverFacade.logout();
-                        loggedIn = false; // Assume logout is successful for this example
-                        System.out.println("Logged out successfully.");
+                        try {
+                            serverFacade.logout(userToken.authToken());
+                            loggedIn = false;
+                            userToken = null;
+                            System.out.println("Logged out successfully.");
+                        } catch (Exception e) {
+                            System.out.println("Logout failed: " + e.getMessage());
+                        }
                         break;
+
                     case "create game":
-                        // Call serverFacade.createGame() method and handle the result
                         break;
                     case "list games":
-                        // Call serverFacade.listGames() method and handle the result
                         break;
                     case "join game":
-                        // Call serverFacade.joinGame() method and handle the result
                         break;
                     case "join observer":
-                        // Call serverFacade.joinObserver() method and handle the result
                         break;
                     default:
                         System.out.println("Unknown command.");

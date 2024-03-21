@@ -54,9 +54,20 @@ public class ServerFacade {
         }
     }
 
-
     public void logout(String authToken) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .DELETE()
+                .header("Authorization", authToken)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Logout error: " + response.body());
+        }
     }
+
 
     public Collection<GameData> listGames(String authToken) throws Exception {
         return null;
