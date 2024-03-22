@@ -79,6 +79,8 @@ public class GameService {
                 gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName()));
             } else if ("BLACK".equals(playerColor)) {
                 gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName()));
+            } else if (playerColor.equals("observer")){
+                return;
             } else {
                 throw new BadRequestException("Wrong Color");
             }

@@ -165,7 +165,7 @@ public class ChessClient {
                             int gameId = scanner.nextInt();
                             scanner.nextLine();
 
-                            serverFacade.joinGame(userToken.authToken(), gameId, null);
+                            serverFacade.joinGame(userToken.authToken(), gameId, "observer");
 
                             System.out.println("Observer added to the game successfully.");
                             BoardBuilder chessBoard = new BoardBuilder();
