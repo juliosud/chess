@@ -104,8 +104,9 @@ public class ServerFacadeTests {
         GameData newGame = new GameData(13, "player13", "player23", "Test Game13");
         UserData loginUser = new UserData("user345", "wrongpassword2345", "log@gmail.com345");
         AuthData authToken = serverFacade.register(loginUser);
+        GameData gameData = serverFacade.createGame(authToken.authToken(), newGame);
         String playerColor = "WHITE";
-        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(authToken.authToken(), newGame.gameID(), playerColor));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(authToken.authToken(), gameData.gameID(), playerColor));
     }
 
     @Test
