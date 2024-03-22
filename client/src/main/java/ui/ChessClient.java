@@ -7,6 +7,7 @@ import model.GameData;
 import java.util.Collection;
 import java.util.Scanner;
 
+
 public class ChessClient {
     private ServerFacade serverFacade;
     private Scanner scanner;
@@ -128,7 +129,8 @@ public class ChessClient {
                             if (games != null && !games.isEmpty()) {
                                 System.out.println("List of available games:");
                                 for (GameData game : games) {
-                                    System.out.println("Game ID: " + game.gameID() + ", Game Name: " + game.gameName());
+                                    System.out.println("Game ID: " + game.gameID() + ", Game Name: " + game.gameName() +
+                                            ", White Player: " + game.whiteUsername() + ", Black Player: " + game.blackUsername());
                                 }
                             } else {
                                 System.out.println("No games available.");
@@ -139,9 +141,40 @@ public class ChessClient {
                         break;
 
                     case "join game":
+                        try {
+                            System.out.println("Enter the Game ID:");
+                            int gameId = scanner.nextInt();
+                            scanner.nextLine();
+
+                            System.out.println("Enter player color (WHITE/BLACK):");
+                            String playerColor = scanner.nextLine().toUpperCase();
+
+                            serverFacade.joinGame(userToken.authToken(), gameId, playerColor);
+
+                            System.out.println("Joined game successfully.");
+                            BoardBuilder chessBoard = new BoardBuilder();
+                            chessBoard.printBoard();
+                        } catch (Exception e) {
+                            System.out.println("Error joining the game: " + e.getMessage());
+                        }
                         break;
+
                     case "join observer":
+                        try{
+                            System.out.println("Enter the Game ID:");
+                            int gameId = scanner.nextInt();
+                            scanner.nextLine();
+
+                            serverFacade.joinGame(userToken.authToken(), gameId, null);
+
+                            System.out.println("Observer added to the game successfully.");
+                            BoardBuilder chessBoard = new BoardBuilder();
+                            chessBoard.printBoard();
+                        } catch (Exception e) {
+                            System.out.println("Error joining observer to the game: " + e.getMessage());
+                        }
                         break;
+
                     case "clear":
                         try {
                             serverFacade.clear();

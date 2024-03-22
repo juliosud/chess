@@ -1,5 +1,7 @@
 package dataAccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataAccess.exceptions.DataAccessException;
 import model.GameData;
 import java.sql.*;
@@ -17,7 +19,7 @@ public class MySqlGameDao implements IGameDao {
                 `whiteUsername` VARCHAR(255) NULL,
                 `blackUsername` VARCHAR(255) NULL,
                 `gameName` VARCHAR(255) NOT NULL,
-                `gameStatus` VARCHAR(255) NULL
+                `gameState` TEXT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             """};
         try {
@@ -29,14 +31,16 @@ public class MySqlGameDao implements IGameDao {
 
     @Override
     public int insertGame(GameData game) throws DataAccessException {
-        String insertSQL = "INSERT INTO gameData (gameName) VALUES (?);";
-        int gameId = executeUpdate(insertSQL, game.gameName());
+        ChessGame chessGame = new ChessGame(); // check with TAs
+        String insertSQL = "INSERT INTO gameData (gameName, gameState) VALUES (?, ?);";
+        Gson gson = new Gson();
+        int gameId = executeUpdate(insertSQL, game.gameName(), gson.toJson(chessGame));
         return gameId;
     }
 
     public GameData getGame(int gameId) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData WHERE gameId = ?;"; // Check with TA if I need to return game status
+            String statement = "SELECT gameId, whiteUsername, blackUsername, gameName FROM gameData WHERE gameId = ?;";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameId);
                 try (var rs = ps.executeQuery()) {

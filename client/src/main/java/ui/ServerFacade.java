@@ -6,6 +6,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -88,7 +89,6 @@ public class ServerFacade {
         }
     }
 
-
     public GameData createGame(String authToken, GameData newGame) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/game"))
@@ -106,11 +106,21 @@ public class ServerFacade {
         }
     }
 
-
-
     public void joinGame(String authToken, int gameId, String playerColor) throws Exception {
-        // Implementation for joining a game
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("Authorization", authToken)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(Map.of("playerColor", playerColor,"gameID", gameId))))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to join game: " + response.body());
+        }
     }
+
 
     public void clear() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.IAuthDao;
 import dataAccess.exceptions.AlreadyTakenException;
 import dataAccess.exceptions.BadRequestException;
@@ -10,6 +11,7 @@ import model.GameData;
 import model.AuthData;
 
 import java.util.Collection;
+import java.util.Set;
 
 public class GameService {
     private final IGameDao gameDao;
@@ -29,6 +31,7 @@ public class GameService {
             throw new BadRequestException("Game name cannot be empty.");
         }
 
+        ChessGame chessGame = new ChessGame();
         int gameId;
         try {
             gameId = gameDao.insertGame(gameData);
@@ -80,6 +83,7 @@ public class GameService {
                 throw new BadRequestException("Wrong Color");
             }
         } else {
+            //add observer
             return;
         }
     }
