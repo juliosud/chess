@@ -2,7 +2,9 @@ package ui;
 
 import model.AuthData;
 import model.UserData;
+import model.GameData;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class ChessClient {
@@ -105,14 +107,48 @@ public class ChessClient {
                             System.out.println("Logout failed: " + e.getMessage());
                         }
                         break;
-
                     case "create game":
+                        try {
+                            System.out.println("Enter the name of the game:");
+                            String gameName = scanner.nextLine();
+
+                            GameData newGame = new GameData(0,null,null, gameName);
+                            GameData createdGame = serverFacade.createGame(userToken.authToken(), newGame);
+
+                            System.out.println("Game created successfully. Game ID: " + createdGame.gameID());
+                        } catch (Exception e) {
+                            System.out.println("Error creating the game: " + e.getMessage());
+                        }
                         break;
+
                     case "list games":
+                        try {
+                            Collection<GameData> games = serverFacade.listGames(userToken.authToken());
+
+                            if (games != null && !games.isEmpty()) {
+                                System.out.println("List of available games:");
+                                for (GameData game : games) {
+                                    System.out.println("Game ID: " + game.gameID() + ", Game Name: " + game.gameName());
+                                }
+                            } else {
+                                System.out.println("No games available.");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Error listing games: " + e.getMessage());
+                        }
                         break;
+
                     case "join game":
                         break;
                     case "join observer":
+                        break;
+                    case "clear":
+                        try {
+                            serverFacade.clear();
+                            System.out.println("Database cleared successfully.");
+                        } catch (Exception e) {
+                            System.out.println("Failed to clear database: " + e.getMessage());
+                        }
                         break;
                     default:
                         System.out.println("Unknown command.");

@@ -130,8 +130,9 @@ public class Server {
         try {
             String authToken = req.headers("Authorization");
             Collection<GameData> games = gameService.listGames(authToken);
-            res.status(200); // HTTP 200 OK
-            return gson.toJson(Map.of("games", games));
+            res.status(200);
+//            return gson.toJson(Map.of("games", games));
+            return gson.toJson(games);
         } catch (UnauthorizedException e) {
             res.status(401);
             return gson.toJson(Map.of("message", "Error: unauthorized"));
