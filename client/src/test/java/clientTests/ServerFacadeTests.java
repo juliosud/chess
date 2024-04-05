@@ -67,8 +67,6 @@ public class ServerFacadeTests {
         Assertions.assertThrows(Exception.class, () -> serverFacade.logout(authToken));
     }
 
-
-
     @Test
     void listGamesPositiveTest() throws Exception {
         UserData loginUser = new UserData("user3", "wrongpassword23", "log@gmail.com3");
@@ -116,8 +114,6 @@ public class ServerFacadeTests {
         String playerColor = "WHITE";
         Assertions.assertThrows(Exception.class, () -> serverFacade.joinGame(authToken, gameId, playerColor));
     }
-
-
 
     @AfterAll
     static void stopServer() {
