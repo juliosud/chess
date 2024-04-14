@@ -3,17 +3,22 @@ package ui;
 import model.AuthData;
 import model.UserData;
 import model.GameData;
-
 import java.util.Collection;
 import java.util.Scanner;
 
+import java.net.URI;
+
+
 
 public class ChessClient {
+    private final WebSocketHandler webSocketHandler;
     private ServerFacade serverFacade;
     private Scanner scanner;
     private AuthData userToken;
 
     public ChessClient(ServerFacade serverFacade) {
+        this.webSocketHandler = new WebSocketHandler(URI.create("ws://localhost:8080/connect"));
+
         this.serverFacade = serverFacade;
         this.scanner = new Scanner(System.in);
         this.userToken = null;
@@ -142,18 +147,25 @@ public class ChessClient {
 
                     case "join game":
                         try {
-                            System.out.println("Enter the Game ID:");
-                            int gameId = scanner.nextInt();
-                            scanner.nextLine();
+                            System.out.println("Connecting to WebSocket server...");
+                            webSocketHandler.connect();
+                            System.out.println("Connected to WebSocket server.");
 
-                            System.out.println("Enter player color (WHITE/BLACK):");
-                            String playerColor = scanner.nextLine().toUpperCase();
+                            System.out.println("Welcome to Chess!");
 
-                            serverFacade.joinGame(userToken.authToken(), gameId, playerColor);
-
-                            System.out.println("Joined game successfully.");
-                            BoardBuilder chessBoard = new BoardBuilder();
-                            chessBoard.printBoard();
+//                        try {
+//                            System.out.println("Enter the Game ID:");
+//                            int gameId = scanner.nextInt();
+//                            scanner.nextLine();
+//
+//                            System.out.println("Enter player color (WHITE/BLACK):");
+//                            String playerColor = scanner.nextLine().toUpperCase();
+//
+//                            serverFacade.joinGame(userToken.authToken(), gameId, playerColor);
+//
+//                            System.out.println("Joined game successfully.");
+//                            BoardBuilder chessBoard = new BoardBuilder();
+//                            chessBoard.printBoard();
                         } catch (Exception e) {
                             System.out.println("Error joining the game: " + e.getMessage());
                         }
