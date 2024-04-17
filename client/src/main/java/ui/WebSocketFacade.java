@@ -7,6 +7,7 @@ import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinObserver;
 import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.Leave;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -50,7 +51,6 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        // Optional: Handle WebSocket open event
     }
 
     public void joinPlayer(String authToken, Integer gameID, String playerColor) throws ResponseException {
@@ -65,6 +65,15 @@ public class WebSocketFacade extends Endpoint {
     public void joinObserver(String authToken, Integer gameID) throws ResponseException {
         try {
             JoinObserver command = new JoinObserver(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void leaveGame(String authToken, Integer gameID) throws ResponseException, IOException {
+        try {
+            Leave command = new Leave(authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());

@@ -3,8 +3,8 @@ package webSocketMessages.userCommands;
 import chess.ChessGame;
 
 public class JoinPlayer extends UserGameCommand {
-    private final Integer gameID;
-    private final String playerColor;
+    public final Integer gameID;
+    public final String playerColor;
 
     public JoinPlayer(String authToken, Integer gameID, String playerColor) {
         super(authToken);

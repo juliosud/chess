@@ -10,7 +10,7 @@ public class BoardBuilder {
         initializeBoard();
     }
 
-    private void initializeBoard() {
+    private static void initializeBoard() {
         // Initialize the board with pawns
         for (int i = 0; i < BOARD_SIZE; i++) {
             pieces[1][i] = EscapeSequences.WHITE_PAWN;
@@ -88,5 +88,9 @@ public class BoardBuilder {
     public static void main(String[] args) {
         BoardBuilder chessBoard = new BoardBuilder();
         chessBoard.printBoard();
+    }
+
+    public static void redrawChessBoard(){
+        initializeBoard();
     }
 }

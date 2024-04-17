@@ -86,9 +86,30 @@ public class MySqlGameDao implements IGameDao {
         return games;
     }
 
+    public ChessGame getGameState(int gameId) throws DataAccessException {
+        String query = "SELECT gameState FROM gameData WHERE gameId = ?;";
+        Gson gson = new Gson();
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, gameId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String gameStateJson = rs.getString("gameState");
+                    return gson.fromJson(gameStateJson, ChessGame.class);
+                } else {
+                    throw new DataAccessException("Game with ID " + gameId + " not found.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to retrieve game state: " + e.getMessage());
+        }
+    }
+
     @Override
     public void clear() throws DataAccessException {
         String truncateSQL = "TRUNCATE gameData;";
         executeUpdate(truncateSQL);
     }
+
+
 }

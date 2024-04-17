@@ -5,17 +5,27 @@ import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 
+
+
+
+import java.util.Map;
 import java.util.Scanner;
+
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
 
 
 public class Repl implements NotificationHandler {
-    boolean loggedIn = false;
+
     private final WSChessClient client;
     private final Scanner scanner;
+    boolean loggedIn = false;
+    boolean inGame = false;
+    private Integer inGameID;
 
-    public Repl (WSChessClient client) {
-        this.client = client;
-        this.scanner = new Scanner(System.in);
+    public Repl (String URL) throws ResponseException {
+        client  = new WSChessClient(URL,this);
+        scanner = new Scanner(System.in);
     }
 
     public void run() throws Exception {
@@ -78,47 +88,77 @@ public class Repl implements NotificationHandler {
                         break;
                 }
             } else {
-                switch (command) {
-                    case "help":
-                        System.out.println("Available commands:");
-                        System.out.println("help - Show this message");
-                        System.out.println("logout - Log out from your account");
-                        System.out.println("create game - Create a new game");
-                        System.out.println("list games - List all available games");
-                        System.out.println("join game - Join an existing game");
-                        System.out.println("join observer - Join as an observer in a game");
-                        break;
-                    case "list":
-                        client.listGames().forEach(game -> System.out.println("ID: " + game.gameID() + ", Game Name: " + game.gameName() + ", WHITE: " + game.whiteUsername() + ", BLACK: " + game.blackUsername()));
-                        break;
-                    case "create":
-                        System.out.print("Enter the name of the game: ");
-                        String gameName = scanner.nextLine();
-                        GameData newGame = client.createGame(gameName);
-                        System.out.println("Created ID: " + newGame.gameID());
-                        break;
-                    case "join":
-                        System.out.print("Enter Game ID to join: ");
-                        int gameId = Integer.parseInt(scanner.nextLine());
-                        System.out.print("Enter player type (white/black/observer): ");
-                        String playerType = scanner.nextLine().toUpperCase();
-                        client.joinGame(gameId, playerType);
-                        System.out.println("Joined game.");
-                        BoardBuilder chessBoard = new BoardBuilder();
-                        chessBoard.printBoard();
-                        break;
-                    case "logout":
-                        client.logout();
-                        System.out.println("Logged out successfully.");
-                        loggedIn = false;
-                        break;
-                    case "quit":
-                        System.out.println("Exiting program.");
-                        return;
-                    default:
-                        System.out.println("Unknown command.");
-                        break;
+                if (!inGame){
+                    switch (command) {
+                        case "help":
+                            System.out.println("Available commands:");
+                            System.out.println("help - Show this message");
+                            System.out.println("logout - Log out from your account");
+                            System.out.println("create game - Create a new game");
+                            System.out.println("list games - List all available games");
+                            System.out.println("join game - Join an existing game");
+                            System.out.println("join observer - Join as an observer in a game");
+                            break;
+                        case "list":
+                            client.listGames().forEach(game -> System.out.println("ID: " + game.gameID() + ", Game Name: " + game.gameName() + ", WHITE: " + game.whiteUsername() + ", BLACK: " + game.blackUsername()));
+                            break;
+                        case "create":
+                            System.out.print("Enter the name of the game: ");
+                            String gameName = scanner.nextLine();
+                            //GameData newGame = client.createGame(gameName);
+                            Map<String, Integer> newGame = client.createGame(gameName);
+                            System.out.println("Created ID: " + newGame.get("gameID"));
+                            break;
+                        case "join":
+                            System.out.print("Enter Game ID to join: ");
+                            int gameId = Integer.parseInt(scanner.nextLine());
+                            System.out.print("Enter player type (white/black/observer): ");
+                            String playerType = scanner.nextLine().toUpperCase();
+                            if (playerType.equals("OBSERVER")){
+                                client.joinObserver(gameId);
+                            } else {
+                                client.joinGame(gameId, playerType);
+                            }
+                            System.out.println("Joined game.");
+                            inGame = true;
+                            inGameID = gameId;
+                            //BoardBuilder chessBoard = new BoardBuilder();
+                            //chessBoard.printBoard();
+                            break;
+                        case "logout":
+                            client.logout();
+                            System.out.println("Logged out successfully.");
+                            loggedIn = false;
+                            break;
+                        case "quit":
+                            System.out.println("Exiting program.");
+                            return;
+                        default:
+                            System.out.println("Unknown command.");
+                            break;
+                    }
+                } else {
+                    switch (command){
+                        case "redraw":
+                            client.redrawChessBoard();
+                            break;
+                        case "leave":
+                            client.leaveGame(inGameID);
+                            inGame = false;
+                            break;
+                        case "move":
+                            break;
+                        case "resign":
+                            break;
+                        case "highlight":
+                            break;
+                        default:
+                            System.out.println("Unknown command.");
+                            break;
+                    }
+
                 }
+
             }
         } catch (Exception e) {
             System.out.println("Error processing command: " + e.getMessage());
@@ -128,6 +168,8 @@ public class Repl implements NotificationHandler {
 
     @Override
     public void notify(Notification notification) {
+        System.out.println("\n" + SET_TEXT_COLOR_BLUE + notification.message + SET_TEXT_COLOR_GREEN);
+        printPrompt();
 
     }
 
@@ -141,9 +183,12 @@ public class Repl implements NotificationHandler {
 
     }
 
+    private void printPrompt() {
+        System.out.print("\n" + ">>> ");
+    }
+
     public static void main(String[] args) throws Exception {
-        WSChessClient client = new WSChessClient("http://localhost:8080",this);
-        Repl repl = new Repl(client);
+        Repl repl = new Repl("http://localhost:8080");
         repl.run();
     }
 }

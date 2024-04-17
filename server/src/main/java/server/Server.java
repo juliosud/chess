@@ -17,10 +17,14 @@ import spark.Spark;
 import java.util.Collection;
 import java.util.Map;
 
+import model.GameData;
+import server.WebSocketHandler;
+
 public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final Gson gson = new Gson();
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         MySqlAuthDao authDao = new MySqlAuthDao();
@@ -29,11 +33,14 @@ public class Server {
 
         this.userService = new UserService(userDao, authDao);
         this.gameService = new GameService(gameDao,authDao);
+        this.webSocketHandler = new WebSocketHandler();
+
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
+        Spark.webSocket("/connect", webSocketHandler);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
@@ -41,8 +48,14 @@ public class Server {
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
+        Spark.exception(Exception.class, this::exceptionHandler);
         Spark.awaitInitialization();
         return Spark.port();
+    }
+
+    private void exceptionHandler(Exception e, Request request, Response response) {
+        response.status(500);
+        response.body(gson.toJson(Map.of("message", "An error occurred: " + e.getMessage())));
     }
 
     private Object register(Request req, Response res) {
