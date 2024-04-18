@@ -1,5 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
 public class BoardBuilder {
 
     private static final int BOARD_SIZE = 8;
@@ -30,6 +34,37 @@ public class BoardBuilder {
         pieces[7][3] = EscapeSequences.BLACK_QUEEN;
         pieces[7][4] = EscapeSequences.BLACK_KING;
     }
+
+    public void printBoardFromChessBoard(ChessBoard chessBoard) {
+        updateBoardWithChessBoard(chessBoard);
+        printBoard();
+    }
+
+    private static void updateBoardWithChessBoard(ChessBoard chessBoard) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = chessBoard.getPiece(position);
+                //pieces[row][col] = convertPieceToSymbol(piece);
+            }
+        }
+    }
+//    private static String convertPieceToSymbol(ChessPiece piece) {
+//        if (piece == null) return EscapeSequences.EMPTY;
+//
+//        String symbol = "";
+//        switch (piece.getType()) {
+//            case PAWN:   symbol = "P"; break;
+//            case KNIGHT: symbol = "N"; break;
+//            case BISHOP: symbol = "B"; break;
+//            case ROOK:   symbol = "R"; break;
+//            case QUEEN:  symbol = "Q"; break;
+//            case KING:   symbol = "K"; break;
+//        }
+//
+//        // Append a symbol or color code based on the team color
+//        return (piece.getColor() == ChessPiece.TeamColor.WHITE) ? EscapeSequences.SET_TEXT_COLOR_WHITE + symbol : EscapeSequences.SET_TEXT_COLOR_BLACK + symbol;
+//    }
 
     public void printBoard() {
         printBoardInternal(false); // Print the board in standard orientation

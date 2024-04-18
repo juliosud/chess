@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor teamTurn = TeamColor.WHITE;
+    private boolean isGameOver = false;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -68,6 +69,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
+        if (isGameOver){
+            throw new InvalidMoveException("Game is over my dear!!!");
+        }
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null || piece.getTeamColor() != teamTurn){
             throw new InvalidMoveException("No piece at the start position or not your turn.");
@@ -209,6 +214,16 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+
+    public void terminateGame(){
+        isGameOver = true;
+    }
+
+    public boolean getGameOver(){
+        return isGameOver;
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

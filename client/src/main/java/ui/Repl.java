@@ -1,5 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameData;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
@@ -116,14 +120,17 @@ public class Repl implements NotificationHandler {
                             String playerType = scanner.nextLine().toUpperCase();
                             if (playerType.equals("OBSERVER")){
                                 client.joinObserver(gameId);
+                                System.out.println("Joined game as OBSERVER.");
+                                inGame = true;
+                                inGameID = gameId;
+                                client.redrawChessBoard(inGameID);
                             } else {
                                 client.joinGame(gameId, playerType);
+                                System.out.println("Joined game.");
+                                inGame = true;
+                                inGameID = gameId;
+                                client.redrawChessBoard(inGameID);
                             }
-                            System.out.println("Joined game.");
-                            inGame = true;
-                            inGameID = gameId;
-                            //BoardBuilder chessBoard = new BoardBuilder();
-                            //chessBoard.printBoard();
                             break;
                         case "logout":
                             client.logout();
@@ -139,16 +146,61 @@ public class Repl implements NotificationHandler {
                     }
                 } else {
                     switch (command){
+                        case "help":
+                            System.out.println("redraw");
+                            System.out.println("leave");
+                            System.out.println("move");
+                            System.out.println("resign");
+                            System.out.println("highlight");
                         case "redraw":
-                            client.redrawChessBoard();
+                            client.redrawChessBoard(inGameID);
                             break;
                         case "leave":
                             client.leaveGame(inGameID);
                             inGame = false;
+                            inGameID = null;
                             break;
                         case "move":
+                            if (inGameID != null) {
+                                System.out.print("Enter move (e.g., a2-a3): ");
+                                String moveInput = scanner.nextLine();
+                                String[] moveParts = moveInput.split("-");
+
+                                if (moveParts.length == 2) {
+                                    String start = moveParts[0].trim().toLowerCase();
+                                    String end = moveParts[1].trim().toLowerCase();
+
+                                    if (start.length() == 2 && end.length() == 2) {
+                                        ChessPosition startPosition = parseChessPosition(start);
+                                        ChessPosition endPosition = parseChessPosition(end);
+
+                                        if (startPosition != null && endPosition != null) {
+                                            ChessMove move = new ChessMove(startPosition, endPosition, null);
+
+                                            try {
+                                                client.makeMove(inGameID, move);
+                                            } catch (Exception e) {
+                                                System.out.println("Error making move: " + e.getMessage());
+                                            }
+                                        } else {
+                                            System.out.println("Invalid move format. Please use format like 'a2-a3'.");
+                                        }
+                                    } else {
+                                        System.out.println("Invalid move format. Please use format like 'a2-a3'.");
+                                    }
+                                } else {
+                                    System.out.println("Invalid move format. Please use format like 'a2-a3'.");
+                                }
+                            } else {
+                                System.out.println("Not in a game. Use 'join' command to join a game.");
+                            }
                             break;
+
+
                         case "resign":
+                            client.resignGame(inGameID);
+                            inGame = false;
+                            inGameID = null;
                             break;
                         case "highlight":
                             break;
@@ -165,6 +217,24 @@ public class Repl implements NotificationHandler {
         }
     }
 
+    public ChessPosition parseChessPosition(String input) {
+        if (input.length() != 2) {
+            return null; // Invalid input format, return null
+        }
+
+        char colChar = Character.toLowerCase(input.charAt(0));
+        int col = colChar - 'a';
+        int row = Character.getNumericValue(input.charAt(1)) - 1;
+
+        // Check if the row and column values are within the valid range
+        if (col >= 0 && col <= 7 && row >= 0 && row <= 7) {
+            return new ChessPosition(row, col);
+        } else {
+            return null;
+        }
+    }
+
+
 
     @Override
     public void notify(Notification notification) {
@@ -175,7 +245,8 @@ public class Repl implements NotificationHandler {
 
     @Override
     public void load(LoadGame loadGame) {
-
+        ChessGame game = loadGame.game;
+        ChessBoardPrinter.printChessBoard(game.getBoard());
     }
 
     @Override

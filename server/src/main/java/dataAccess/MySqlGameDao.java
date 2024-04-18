@@ -112,4 +112,23 @@ public class MySqlGameDao implements IGameDao {
     }
 
 
+    public void updateGameState(int gameID, ChessGame gameToMove) throws DataAccessException {
+        String updateSQL = "UPDATE gameData SET gameState = ? WHERE gameId = ?;";
+        Gson gson = new Gson();
+        String gameStateJson = gson.toJson(gameToMove);
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(updateSQL)) {
+            ps.setString(1, gameStateJson);
+            ps.setInt(2, gameID);
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new DataAccessException("Failed to update game state.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update game state: " + e.getMessage());
+        }
+    }
+
 }

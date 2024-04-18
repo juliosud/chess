@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessMove;
 import model.AuthData;
 import model.UserData;
 import model.GameData;
@@ -63,9 +64,8 @@ public class WSChessClient {
         webSocketFacade.joinObserver(this.userToken.authToken(),gameId);
     }
 
-    public void redrawChessBoard() {
-        // Assuming 'board' is an object that contains the current state of the chess board
-        BoardBuilder.redrawChessBoard(); // This method should handle the drawing of the chess board
+    public void redrawChessBoard(int gameID) throws ResponseException {
+        webSocketFacade.fetchGameState(this.userToken.authToken(),gameID);
     }
 
     public void leaveGame(int gameId) throws Exception {
@@ -73,4 +73,12 @@ public class WSChessClient {
         //transitionToPostLoginUI(); // Method to handle UI transition after leaving the game
     }
 
+    public void resignGame(Integer gameId) throws ResponseException {
+        this.webSocketFacade.resignGame(this.userToken.authToken(), gameId);
+    }
+
+    public void makeMove(Integer inGameID, ChessMove move) throws ResponseException {
+        this.webSocketFacade.makeMove(this.userToken.authToken(), inGameID, move);
+        webSocketFacade.fetchGameState(this.userToken.authToken(),inGameID);
+    }
 }

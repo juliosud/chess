@@ -1,6 +1,9 @@
 package server;
 
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccess.MySqlAuthDao;
 import dataAccess.MySqlGameDao;
@@ -36,11 +39,59 @@ public class WebSocketHandler {
             case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMove.class), session);
             case LEAVE -> leave(new Gson().fromJson(message, Leave.class), session);
             case RESIGN -> resign(new Gson().fromJson(message, Resign.class), session);
+            case FETCH_GAME_STATE -> onFetchGameState(new Gson().fromJson(message, FetchGameState.class), session);
+        }
+    }
+
+    private void onFetchGameState(FetchGameState command, Session session) throws DataAccessException {
+        ChessGame gameState = gameDao.getGameState(command.gameID);
+        Gson gson = new Gson();
+        try {
+            session.getRemote().sendString(gson.toJson(new LoadGame(gameState)));
+        } catch (IOException e) {
+
         }
     }
 
     private void resign(Resign resign, Session session) {
+        String authToken = resign.getAuthString();
+        int gameId = resign.gameID;
+
+        try {
+            AuthData user = authDao.getAuthToken(authToken);
+            if (user != null) {
+                GameData game = gameDao.getGame(gameId);
+                if (game != null) {
+                    // Check if the user is white or black and update accordingly
+                    if (user.username().equals(game.whiteUsername())) {
+                        GameData newGame = new GameData(gameId, null, game.blackUsername(), game.gameName());
+                        gameDao.updateGame(newGame);
+                    } else if (user.username().equals(game.blackUsername())) {
+                        GameData newGame = new GameData(gameId, game.whiteUsername(), null, game.gameName());
+                        gameDao.updateGame(newGame);
+                    }
+                    ChessGame gameState = gameDao.getGameState(game.gameID());
+                    gameState.terminateGame();
+
+                    // Notify players about the resignation
+                    Notification notification = new Notification(user.username() + " has resigned.");
+                    connections.broadcast(authToken, gameId, notification);
+
+                    // Remove the resigning player from the connection manager
+                    connections.remove(authToken);
+                } else {
+                    session.getRemote().sendString(new Gson().toJson(new Error("Failed to resign or game not found.")));
+                }
+            } else {
+                session.getRemote().sendString(new Gson().toJson(new Error("Unauthorized access.")));
+            }
+        } catch (DataAccessException | IOException e) {
+            e.printStackTrace();
+            // Handle exceptions appropriately
+        }
     }
+
+
 
     private void leave(Leave leave, Session session) throws IOException {
         String authToken = leave.getAuthString();
@@ -74,8 +125,29 @@ public class WebSocketHandler {
 
 
 
-    private void makeMove(MakeMove makeMove, Session session) {
+    private void makeMove(MakeMove command, Session session) throws DataAccessException {
+        String authToken = command.getAuthString();
+        int gameId = command.gameID;
+
+        try {
+            AuthData user = authDao.getAuthToken(authToken);
+            if (user != null) {
+                GameData game = gameDao.getGame(gameId);
+                if (game != null) {
+                    ChessGame gameToMove = gameDao.getGameState(gameId);
+                    gameToMove.makeMove(command.move);
+                    gameDao.updateGameState(gameId,gameToMove);
+                    Notification notification = new Notification(user.username() + " made a move: " + command.move);
+                    connections.broadcast(authToken, gameId, notification);
+
+                }
+            }
+        } catch (InvalidMoveException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+
 
     private void joinObserver(JoinObserver joinObserver, Session session) throws DataAccessException, IOException {
         String authToken = joinObserver.getAuthString();
